@@ -2,12 +2,12 @@ package org.pinsoft.interview.web.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kl.socialnetwork.domain.models.serviceModels.LoggerServiceModel;
-import kl.socialnetwork.domain.models.viewModels.logger.LoggerViewModel;
-import kl.socialnetwork.services.LoggerService;
-import kl.socialnetwork.utils.responseHandler.exceptions.CustomException;
-import kl.socialnetwork.utils.responseHandler.successResponse.SuccessResponse;
 import org.modelmapper.ModelMapper;
+import org.pinsoft.interview.domain.dto.logger.LoggerServiceModel;
+import org.pinsoft.interview.domain.dto.logger.LoggerViewModel;
+import org.pinsoft.interview.service.LoggerService;
+import org.pinsoft.interview.utils.responseHandler.exceptions.CustomException;
+import org.pinsoft.interview.utils.responseHandler.successResponse.SuccessResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static kl.socialnetwork.utils.constants.ResponseMessageConstants.*;
+import static org.pinsoft.interview.utils.constants.ResponseMessageConstants.*;
 
 @RestController
 @RequestMapping(value = "/logs")
@@ -53,7 +53,7 @@ public class LoggerController {
     }
 
     @DeleteMapping(value = "/clear")
-    public ResponseEntity deleteLogs() throws JsonProcessingException {
+    public ResponseEntity<String> deleteLogs() throws JsonProcessingException {
         boolean result = this.loggerService.deleteAll();
 
         if (result) {
@@ -64,7 +64,7 @@ public class LoggerController {
     }
 
     @DeleteMapping(value = "/clearByName/{username}")
-    public ResponseEntity deleteLogsByName(@PathVariable String username) throws JsonProcessingException {
+    public ResponseEntity<String> deleteLogsByName(@PathVariable String username) throws JsonProcessingException {
         boolean result = this.loggerService.deleteByName(username);
 
         if (result) {

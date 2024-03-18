@@ -1,29 +1,30 @@
 package org.pinsoft.interview.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kl.socialnetwork.domain.models.bindingModels.message.MessageCreateBindingModel;
-import kl.socialnetwork.domain.models.serviceModels.MessageServiceModel;
-import kl.socialnetwork.domain.models.viewModels.message.MessageAllViewModel;
-import kl.socialnetwork.domain.models.viewModels.message.MessageFriendsViewModel;
-import kl.socialnetwork.services.MessageService;
-import kl.socialnetwork.utils.responseHandler.exceptions.CustomException;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.pinsoft.interview.domain.dto.message.MessageAllViewModel;
+import org.pinsoft.interview.domain.dto.message.MessageCreateBindingModel;
+import org.pinsoft.interview.domain.dto.message.MessageFriendsViewModel;
+import org.pinsoft.interview.domain.dto.message.MessageServiceModel;
+import org.pinsoft.interview.service.MessageService;
+import org.pinsoft.interview.utils.responseHandler.exceptions.CustomException;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static kl.socialnetwork.utils.constants.ResponseMessageConstants.*;
+import static org.pinsoft.interview.utils.constants.ResponseMessageConstants.SERVER_ERROR_MESSAGE;
 
 @RestController()
 @RequestMapping(value = "/message")
+@RequiredArgsConstructor
 public class MessageController {
     // The SimpMessagingTemplate is used to send Stomp over WebSocket messages.
     private final SimpMessagingTemplate template;
@@ -32,14 +33,6 @@ public class MessageController {
     private final ModelMapper modelMapper;
     private final ObjectMapper objectMapper;
 
-
-    @Autowired
-    public MessageController(SimpMessagingTemplate template, MessageService messageService, ModelMapper modelMapper, ObjectMapper objectMapper) {
-        this.template = template;
-        this.messageService = messageService;
-        this.modelMapper = modelMapper;
-        this.objectMapper = objectMapper;
-    }
 
     @GetMapping(value = "/all/{id}")
     public List<MessageAllViewModel> getAllMessages(@PathVariable(value = "id") String chatUserId, Authentication principal) {

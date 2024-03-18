@@ -1,30 +1,25 @@
 package org.pinsoft.interview.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kl.socialnetwork.domain.models.bindingModels.user.UserRegisterBindingModel;
-import kl.socialnetwork.domain.models.bindingModels.user.UserUpdateBindingModel;
-import kl.socialnetwork.domain.models.serviceModels.UserServiceModel;
-import kl.socialnetwork.domain.models.viewModels.user.UserAllViewModel;
-import kl.socialnetwork.domain.models.viewModels.user.UserCreateViewModel;
-import kl.socialnetwork.domain.models.viewModels.user.UserDetailsViewModel;
-import kl.socialnetwork.services.UserService;
-import kl.socialnetwork.utils.responseHandler.exceptions.BadRequestException;
-import kl.socialnetwork.utils.responseHandler.exceptions.CustomException;
-import kl.socialnetwork.utils.responseHandler.successResponse.SuccessResponse;
-import kl.socialnetwork.validations.serviceValidation.services.UserValidationService;
 import org.modelmapper.ModelMapper;
+import org.pinsoft.interview.domain.dto.user.*;
+import org.pinsoft.interview.service.UserService;
+import org.pinsoft.interview.utils.responseHandler.exceptions.BadRequestException;
+import org.pinsoft.interview.utils.responseHandler.exceptions.CustomException;
+import org.pinsoft.interview.utils.responseHandler.successResponse.SuccessResponse;
+import org.pinsoft.interview.utils.validations.serviceValidation.services.UserValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static kl.socialnetwork.utils.constants.ResponseMessageConstants.*;
+import static org.pinsoft.interview.utils.constants.ResponseMessageConstants.*;
 
 @RestController
 @RequestMapping(value = "/users")
@@ -58,7 +53,7 @@ public class UserController {
         UserServiceModel user = modelMapper.map(userRegisterBindingModel, UserServiceModel.class);
         UserCreateViewModel savedUser = this.userService.createUser(user);
 
-        SuccessResponse successResponse = successResponseBuilder(LocalDateTime.now(), SUCCESSFUL_REGISTER_MESSAGE, savedUser, true);
+        SuccessResponse successResponse = successResponseBuilder(LocalDateTime.now(), SUCCESSFUL_REGISTER_MESSAGE, savedUser);
 
         return new ResponseEntity<>(this.objectMapper.writeValueAsString(successResponse), HttpStatus.OK);
     }
@@ -68,23 +63,19 @@ public class UserController {
         List<UserServiceModel> allUsers = this.userService.getAllUsers(userId);
 
         return allUsers.stream()
-                .map(x -> {
-                    UserAllViewModel userAllViewModel = this.modelMapper.map(x, UserAllViewModel.class);
-                    userAllViewModel.setRole(x.extractAuthority());
-                    return userAllViewModel;
-                })
+                .map(x -> this.modelMapper.map(x, UserAllViewModel.class))
                 .collect(Collectors.toList());
     }
 
     @GetMapping(value = "/details/{id}")
-    public ResponseEntity getDetails(@PathVariable String id) throws Exception {
+    public ResponseEntity<String> getDetails(@PathVariable String id) throws Exception {
         UserDetailsViewModel user = this.userService.getById(id);
 
         return new ResponseEntity<>(this.objectMapper.writeValueAsString(user), HttpStatus.OK);
     }
 
     @PutMapping(value = "/update/{id}")
-    public ResponseEntity updateUser(@RequestBody @Valid UserUpdateBindingModel userUpdateBindingModel,
+    public ResponseEntity<String> updateUser(@RequestBody @Valid UserUpdateBindingModel userUpdateBindingModel,
                                      @PathVariable(value = "id") String loggedInUserId) throws Exception {
 
         if(!userValidationService.isValid(userUpdateBindingModel)){
@@ -95,7 +86,7 @@ public class UserController {
         boolean result = this.userService.updateUser(userServiceModel, loggedInUserId);
 
         if (result) {
-            SuccessResponse successResponse = successResponseBuilder(LocalDateTime.now(), SUCCESSFUL_USER_PROFILE_EDIT_MESSAGE, "", true);
+            SuccessResponse successResponse = successResponseBuilder(LocalDateTime.now(), SUCCESSFUL_USER_PROFILE_EDIT_MESSAGE, "");
             return new ResponseEntity<>(this.objectMapper.writeValueAsString(successResponse), HttpStatus.OK);
         }
 
@@ -107,7 +98,7 @@ public class UserController {
             boolean result = this.userService.deleteUserById(id);
 
             if(result){
-                SuccessResponse successResponse = successResponseBuilder(LocalDateTime.now(), SUCCESSFUL_USER_DELETE_MESSAGE, "", true);
+                SuccessResponse successResponse = successResponseBuilder(LocalDateTime.now(), SUCCESSFUL_USER_DELETE_MESSAGE, "");
                 return new ResponseEntity<>(this.objectMapper.writeValueAsString(successResponse), HttpStatus.OK);
             }
 
@@ -115,31 +106,7 @@ public class UserController {
     }
 
 
-    @PostMapping(value = "/promote")
-    public ResponseEntity promoteUser(@RequestParam(name = "id") String id) throws Exception {
-        boolean resultOfPromoting = this.userService.promoteUser(id);
-
-        if (resultOfPromoting) {
-            SuccessResponse successResponse = successResponseBuilder(LocalDateTime.now(), SUCCESSFUL_USER_PROMOTED_MESSAGE, "", true);
-            return new ResponseEntity<>(this.objectMapper.writeValueAsString(successResponse), HttpStatus.OK);
-        }
-
-        throw new CustomException(USER_FAILURE_PROMOTING_MESSAGE);
-    }
-
-    @PostMapping(value = "/demote")
-    public ResponseEntity demoteUser(@RequestParam(name = "id") String id) throws Exception {
-        boolean resultOfDemoting = this.userService.demoteUser(id);
-
-        if (resultOfDemoting) {
-
-            SuccessResponse successResponse = successResponseBuilder(LocalDateTime.now(), SUCCESSFUL_USER_DEMOTED_MESSAGE, "", true);
-            return new ResponseEntity<>(this.objectMapper.writeValueAsString(successResponse), HttpStatus.OK);
-        }
-        throw new CustomException(USER_FAILURE_DEMOTING_MESSAGE);
-    }
-
-    private SuccessResponse successResponseBuilder(LocalDateTime timestamp, String message, Object payload, boolean success) {
-        return new SuccessResponse(timestamp, message, payload, success);
+    private SuccessResponse successResponseBuilder(LocalDateTime timestamp, String message, Object payload) {
+        return new SuccessResponse(timestamp, message, payload, true);
     }
 }

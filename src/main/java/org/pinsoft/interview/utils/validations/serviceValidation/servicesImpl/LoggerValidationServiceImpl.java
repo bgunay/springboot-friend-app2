@@ -1,7 +1,7 @@
 package org.pinsoft.interview.utils.validations.serviceValidation.servicesImpl;
 
-import kl.socialnetwork.domain.models.serviceModels.LoggerServiceModel;
-import kl.socialnetwork.validations.serviceValidation.services.LoggerValidationService;
+import org.pinsoft.interview.domain.dto.logger.LoggerServiceModel;
+import org.pinsoft.interview.utils.validations.serviceValidation.services.LoggerValidationService;
 import org.springframework.stereotype.Component;
 
 @Component

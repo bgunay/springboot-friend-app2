@@ -5,6 +5,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.pinsoft.interview.domain.dto.user.UserCreateViewModel;
+import org.pinsoft.interview.domain.dto.user.UserDetailsViewModel;
+import org.pinsoft.interview.domain.dto.user.UserEditViewModel;
 import org.pinsoft.interview.domain.dto.user.UserServiceModel;
 import org.pinsoft.interview.domain.repo.UserRepository;
 import org.pinsoft.interview.domain.repo.entity.User;
@@ -12,20 +14,15 @@ import org.pinsoft.interview.service.LoggerService;
 import org.pinsoft.interview.service.UserService;
 import org.pinsoft.interview.utils.responseHandler.exceptions.CustomException;
 import org.pinsoft.interview.utils.validations.serviceValidation.services.UserValidationService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import static kl.socialnetwork.utils.constants.ResponseMessageConstants.*;
-import static org.pinsoft.interview.utils.constants.ResponseMessageConstants.SERVER_ERROR_MESSAGE;
-import static org.pinsoft.interview.utils.constants.ResponseMessageConstants.UNAUTHORIZED_SERVER_ERROR_MESSAGE;
+import static org.pinsoft.interview.utils.constants.ResponseMessageConstants.*;
 
 @Service
 @Transactional
@@ -38,8 +35,8 @@ public class UserServiceImpl implements UserService {
     private final LoggerService loggerService;
 
     @PostConstruct
-    public void isOnlineSetup(){
-        if(this.userRepository.count() > 0){
+    public void isOnlineSetup() {
+        if (this.userRepository.count() > 0) {
             this.userRepository.setIsOnlineToFalse();
         }
     }
@@ -76,17 +73,11 @@ public class UserServiceImpl implements UserService {
             throw new Exception(SERVER_ERROR_MESSAGE);
         }
 
-        if (!userServiceModel.getId().equals(loggedInUserId)) {
-            String userAuthority = this.getUserAuthority(loggedInUserId);
-            if (!("ROOT").equals(userAuthority) && !("ADMIN").equals(userAuthority)) {
-                throw new CustomException(UNAUTHORIZED_SERVER_ERROR_MESSAGE);
-            }
-        }
-
         User userEntity = this.modelMapper.map(userServiceModel, User.class);
         userEntity.setPassword(userToEdit.getPassword());
 
-        return this.userRepository.save(userEntity) != null;
+        this.userRepository.save(userEntity);
+        return true;
     }
 
     @Override
@@ -95,19 +86,15 @@ public class UserServiceImpl implements UserService {
                 .filter(userValidation::isValid)
                 .orElseThrow(() -> new CustomException(SERVER_ERROR_MESSAGE));
 
-        if(changeToOnline){
+        if (changeToOnline) {
             user.setOnline(true);
-        }else {
+        } else {
             user.setOnline(false);
         }
 
         User updatedUser = this.userRepository.save(user);
 
-        if (updatedUser != null) {
-            return this.modelMapper.map(updatedUser, UserServiceModel.class);
-        }
-
-        throw new CustomException(SERVER_ERROR_MESSAGE);
+        return this.modelMapper.map(updatedUser, UserServiceModel.class);
     }
 
 
@@ -119,17 +106,12 @@ public class UserServiceImpl implements UserService {
             throw new Exception(SERVER_ERROR_MESSAGE);
         }
 
-        List<UserRole> userRoles = this.getUserRoles(userById);
 
-        if (userRoles.size() > 0) {
-            return this.userRepository
-                    .findAll()
-                    .stream()
-                    .map(x -> this.modelMapper.map(x, UserServiceModel.class))
-                    .collect(Collectors.toList());
-        }
-
-        throw new CustomException(UNAUTHORIZED_SERVER_ERROR_MESSAGE);
+        return this.userRepository
+                .findAll()
+                .stream()
+                .map(x -> this.modelMapper.map(x, UserServiceModel.class))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -162,7 +144,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean deleteUserById(String id) throws Exception {
-       this.userRepository.findById(id)
+        this.userRepository.findById(id)
                 .filter(userValidation::isValid)
                 .orElseThrow(Exception::new);
 
@@ -174,82 +156,4 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return this.userRepository
-                .findByUsername(username)
-                .filter(userValidation::isValid)
-                .orElseThrow(() -> new UsernameNotFoundException(USER_NOT_FOUND_ERROR_MESSAGE));
-    }
-
-    @Override
-    public boolean promoteUser(String id) throws Exception {
-        User user = this.userRepository.findById(id)
-                .filter(userValidation::isValid)
-                .orElseThrow(Exception::new);
-
-        String userAuthority = this.getUserAuthority(user.getId());
-
-        switch (userAuthority) {
-            case "USER":
-                user.setAuthorities(this.getAuthorities("ADMIN"));
-                break;
-            case "ROOT":
-                throw new CustomException(USER_FAILURE_CHANGING_ROOT_AUTHORITY_MESSAGE);
-            default:
-                throw new CustomException(USER_FAILURE_PROMOTING_ADMIN_MESSAGE);
-        }
-
-        return this.userRepository.save(user) != null;
-    }
-
-    @Override
-    public boolean demoteUser(String id) throws Exception {
-        User user = this.userRepository.findById(id)
-                .filter(userValidation::isValid)
-                .orElseThrow(Exception::new);
-
-        String userAuthority = this.getUserAuthority(user.getId());
-
-        switch (userAuthority) {
-            case "ADMIN":
-                user.setAuthorities(this.getAuthorities("USER"));
-                break;
-            case "ROOT":
-                throw new CustomException(USER_FAILURE_CHANGING_ROOT_AUTHORITY_MESSAGE);
-            case "USER":
-                throw new CustomException(USER_FAILURE_DEMOTING_USER_MESSAGE);
-        }
-
-        return this.userRepository.save(user) != null;
-    }
-
-    private List<UserRole> getUserRoles(User userById) {
-        return userById
-                .getAuthorities()
-                .stream().filter(userRole ->
-                        userRole.getAuthority().equals("ROOT")
-                                || userRole.getAuthority().equals("ADMIN"))
-                .collect(Collectors.toList());
-    }
-
-    private Set<UserRole> getAuthorities(String authority) {
-        Set<UserRole> userAuthorities = new HashSet<>();
-
-        userAuthorities.add(this.roleRepository.getByAuthority(authority));
-
-        return userAuthorities;
-    }
-
-    private String getUserAuthority(String userId) {
-        return this
-                .userRepository
-                .findById(userId)
-                .get()
-                .getAuthorities()
-                .stream()
-                .findFirst()
-                .get()
-                .getAuthority();
-    }
 }

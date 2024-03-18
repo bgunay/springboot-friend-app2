@@ -25,9 +25,5 @@ public interface UserService  {
 
     List<UserServiceModel> getAllUsers(String userId) throws Exception;
 
-    boolean promoteUser(String id) throws Exception;
-
-    boolean demoteUser(String id) throws Exception;
-
     boolean deleteUserById(String id) throws Exception;
 }

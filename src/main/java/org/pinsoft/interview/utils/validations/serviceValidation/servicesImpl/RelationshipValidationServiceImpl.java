@@ -1,7 +1,7 @@
 package org.pinsoft.interview.utils.validations.serviceValidation.servicesImpl;
 
-import kl.socialnetwork.domain.entities.Relationship;
-import kl.socialnetwork.validations.serviceValidation.services.RelationshipValidationService;
+import org.pinsoft.interview.domain.repo.entity.Relationship;
+import org.pinsoft.interview.utils.validations.serviceValidation.services.RelationshipValidationService;
 import org.springframework.stereotype.Component;
 
 @Component

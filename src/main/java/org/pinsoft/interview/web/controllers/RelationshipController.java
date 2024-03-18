@@ -1,13 +1,13 @@
 package org.pinsoft.interview.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kl.socialnetwork.domain.models.serviceModels.RelationshipServiceModel;
-import kl.socialnetwork.domain.models.viewModels.relationship.FriendsAllViewModel;
-import kl.socialnetwork.domain.models.viewModels.relationship.FriendsCandidatesViewModel;
-import kl.socialnetwork.services.RelationshipService;
-import kl.socialnetwork.utils.responseHandler.exceptions.CustomException;
-import kl.socialnetwork.utils.responseHandler.successResponse.SuccessResponse;
 import org.modelmapper.ModelMapper;
+import org.pinsoft.interview.domain.dto.relationship.FriendsAllViewModel;
+import org.pinsoft.interview.domain.dto.relationship.FriendsCandidatesViewModel;
+import org.pinsoft.interview.domain.dto.relationship.RelationshipServiceModel;
+import org.pinsoft.interview.service.RelationshipService;
+import org.pinsoft.interview.utils.responseHandler.exceptions.CustomException;
+import org.pinsoft.interview.utils.responseHandler.successResponse.SuccessResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static kl.socialnetwork.utils.constants.ResponseMessageConstants.*;
+import static org.pinsoft.interview.utils.constants.ResponseMessageConstants.*;
 
 @RestController
 @RequestMapping(value = "/relationship")
@@ -39,19 +39,17 @@ public class RelationshipController {
     public List<FriendsAllViewModel> findAllFriends(@PathVariable String id) throws Exception {
         List<RelationshipServiceModel> allFriends = this.relationshipService.findAllUserRelationshipsWithStatus(id);
 
-        List<FriendsAllViewModel> friendsAllViewModels = allFriends.stream().map(relationshipServiceModel -> {
+        return allFriends.stream().map(relationshipServiceModel -> {
             if (!relationshipServiceModel.getUserOne().getId().equals(id)) {
                 return this.modelMapper.map(relationshipServiceModel.getUserOne(), FriendsAllViewModel.class);
             }
 
             return this.modelMapper.map(relationshipServiceModel.getUserTwo(), FriendsAllViewModel.class);
         }).collect(Collectors.toList());
-
-        return friendsAllViewModels;
     }
 
     @PostMapping(value = "/addFriend")
-    public ResponseEntity addFriend(@RequestBody Map<String, Object> body) throws Exception {
+    public ResponseEntity<String> addFriend(@RequestBody Map<String, Object> body) throws Exception {
         String loggedInUserId = (String) body.get("loggedInUserId");
         String friendCandidateId = (String) body.get("friendCandidateId");
 
@@ -67,7 +65,7 @@ public class RelationshipController {
     }
 
     @PostMapping(value = "/removeFriend")
-    public ResponseEntity removeFriend(@RequestBody Map<String, Object> body) throws Exception {
+    public ResponseEntity<String> removeFriend(@RequestBody Map<String, Object> body) throws Exception {
         String loggedInUserId = (String) body.get("loggedInUserId");
         String friendToRemoveId = (String) body.get("friendToRemoveId");
 
@@ -82,7 +80,7 @@ public class RelationshipController {
     }
 
     @PostMapping(value = "/acceptFriend")
-    public ResponseEntity acceptFriend(@RequestBody Map<String, Object> body) throws Exception {
+    public ResponseEntity<String> acceptFriend(@RequestBody Map<String, Object> body) throws Exception {
         String loggedInUserId = (String) body.get("loggedInUserId");
         String friendToAcceptId = (String) body.get("friendToAcceptId");
 
@@ -96,7 +94,7 @@ public class RelationshipController {
     }
 
     @PostMapping(value = "/cancelRequest")
-    public ResponseEntity cancelFriendshipRequest(@RequestBody Map<String, Object> body) throws Exception {
+    public ResponseEntity<String> cancelFriendshipRequest(@RequestBody Map<String, Object> body) throws Exception {
         String loggedInUserId = (String) body.get("loggedInUserId");
         String friendToRejectId = (String) body.get("friendToRejectId");
 
