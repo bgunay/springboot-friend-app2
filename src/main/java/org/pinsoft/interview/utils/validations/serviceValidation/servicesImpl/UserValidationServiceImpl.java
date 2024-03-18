@@ -1,10 +1,11 @@
 package org.pinsoft.interview.utils.validations.serviceValidation.servicesImpl;
 
-import kl.socialnetwork.domain.entities.User;
-import kl.socialnetwork.domain.models.bindingModels.user.UserRegisterBindingModel;
-import kl.socialnetwork.domain.models.bindingModels.user.UserUpdateBindingModel;
-import kl.socialnetwork.domain.models.serviceModels.UserServiceModel;
-import kl.socialnetwork.validations.serviceValidation.services.UserValidationService;
+import io.micrometer.common.util.StringUtils;
+import org.pinsoft.interview.domain.dto.user.UserRegisterBindingModel;
+import org.pinsoft.interview.domain.dto.user.UserServiceModel;
+import org.pinsoft.interview.domain.dto.user.UserUpdateBindingModel;
+import org.pinsoft.interview.domain.repo.entity.User;
+import org.pinsoft.interview.utils.validations.serviceValidation.services.UserValidationService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +27,10 @@ public class UserValidationServiceImpl implements UserValidationService {
         return userRegisterBindingModel != null && isValid(userRegisterBindingModel.getPassword(), userRegisterBindingModel.getConfirmPassword());
     }
 
+    @Override
+    public boolean isValid(String password) {
+        return StringUtils.isNotBlank(password);
+    }
     @Override
     public boolean isValid(String firstParam, String secondParam) {
         return firstParam.equals(secondParam);

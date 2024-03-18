@@ -1,52 +1,41 @@
 package org.pinsoft.interview.service.impl;
 
-import kl.socialnetwork.domain.entities.User;
-import kl.socialnetwork.domain.entities.UserRole;
-import kl.socialnetwork.domain.models.serviceModels.UserServiceModel;
-import kl.socialnetwork.domain.models.viewModels.user.UserCreateViewModel;
-import kl.socialnetwork.domain.models.viewModels.user.UserDetailsViewModel;
-import kl.socialnetwork.domain.models.viewModels.user.UserEditViewModel;
-import kl.socialnetwork.repositories.RoleRepository;
-import kl.socialnetwork.repositories.UserRepository;
-import kl.socialnetwork.services.LoggerService;
-import kl.socialnetwork.services.UserService;
-import kl.socialnetwork.utils.responseHandler.exceptions.CustomException;
-import kl.socialnetwork.validations.serviceValidation.services.UserValidationService;
+import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.pinsoft.interview.domain.dto.user.UserCreateViewModel;
+import org.pinsoft.interview.domain.dto.user.UserServiceModel;
+import org.pinsoft.interview.domain.repo.UserRepository;
+import org.pinsoft.interview.domain.repo.entity.User;
+import org.pinsoft.interview.service.LoggerService;
+import org.pinsoft.interview.service.UserService;
+import org.pinsoft.interview.utils.responseHandler.exceptions.CustomException;
+import org.pinsoft.interview.utils.validations.serviceValidation.services.UserValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import javax.transaction.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static kl.socialnetwork.utils.constants.ResponseMessageConstants.*;
+import static org.pinsoft.interview.utils.constants.ResponseMessageConstants.SERVER_ERROR_MESSAGE;
+import static org.pinsoft.interview.utils.constants.ResponseMessageConstants.UNAUTHORIZED_SERVER_ERROR_MESSAGE;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
     private final ModelMapper modelMapper;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserValidationService userValidation;
     private final LoggerService loggerService;
-
-    @Autowired
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, ModelMapper modelMapper, BCryptPasswordEncoder bCryptPasswordEncoder, UserValidationService userValidation, LoggerService loggerService) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.modelMapper = modelMapper;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.userValidation = userValidation;
-        this.loggerService = loggerService;
-    }
 
     @PostConstruct
     public void isOnlineSetup(){
@@ -68,23 +57,10 @@ public class UserServiceImpl implements UserService {
         userEntity.setPassword(this.bCryptPasswordEncoder
                 .encode(userEntity.getPassword()));
 
-        UserRole userRole = this.roleRepository.findByAuthority("USER");
-        UserRole rootRole = this.roleRepository.findByAuthority("ROOT");
-        Set<UserRole> roles = new HashSet<>();
-        if (this.userRepository.findAll().isEmpty()) {
-            roles.add(rootRole);
-        } else {
-            roles.add(userRole);
-        }
-
-        userEntity.setAuthorities(roles);
 
         User user = this.userRepository.saveAndFlush(userEntity);
-        if (user != null) {
-            return this.modelMapper.map(userEntity, UserCreateViewModel.class);
-        }
-
-        throw new CustomException(SERVER_ERROR_MESSAGE);
+        UserCreateViewModel userModel = this.modelMapper.map(user, UserCreateViewModel.class);
+        return userModel;
     }
 
     @Override
@@ -109,7 +85,6 @@ public class UserServiceImpl implements UserService {
 
         User userEntity = this.modelMapper.map(userServiceModel, User.class);
         userEntity.setPassword(userToEdit.getPassword());
-        userEntity.setAuthorities(userToEdit.getAuthorities());
 
         return this.userRepository.save(userEntity) != null;
     }

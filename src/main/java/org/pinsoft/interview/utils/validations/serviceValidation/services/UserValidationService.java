@@ -18,4 +18,5 @@ public interface UserValidationService {
     boolean isValid(UserUpdateBindingModel userUpdateBindingModel);
 
     boolean isValid(UserDetails userData);
+    public boolean isValid(String password);
 }
