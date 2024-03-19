@@ -132,7 +132,7 @@ public class UserControllerTests {
 
         this.mvc
                 .perform(post("/users/register")
-                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(TestUtil.convertObjectToJsonString(userRegisterBindingModel)))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -164,7 +164,7 @@ public class UserControllerTests {
 
         Exception resolvedException = this.mvc
                 .perform(post("/users/register")
-                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(TestUtil.convertObjectToJsonString(userRegisterBindingModel)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -263,7 +263,7 @@ public class UserControllerTests {
 
         this.mvc
                 .perform(put("/users/update/{id}", "1")
-                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(TestUtil.convertObjectToJsonString(userUpdateBindingModel)))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -286,7 +286,7 @@ public class UserControllerTests {
 
         Exception resolvedException = this.mvc
                 .perform(put("/users/update/{id}", "1")
-                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(TestUtil.convertObjectToJsonString(userUpdateBindingModel)))
                 .andDo(print())
                 .andExpect(status().isInternalServerError())

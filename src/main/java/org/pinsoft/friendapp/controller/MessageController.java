@@ -13,7 +13,6 @@ import org.pinsoft.friendapp.domain.dto.message.MessageCreateBindingModel;
 import org.pinsoft.friendapp.domain.dto.message.MessageFriendsViewModel;
 import org.pinsoft.friendapp.domain.dto.message.MessageServiceModel;
 import org.pinsoft.friendapp.service.MessageService;
-import org.pinsoft.friendapp.utils.responseHandler.exceptions.BadRequestException;
 import org.pinsoft.friendapp.utils.responseHandler.exceptions.CustomException;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;

@@ -90,7 +90,7 @@ public class MessageControllerTests {
         this.mvc
                 .perform(get("/message/all/{id}", "1"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id", is(messageAllViewModels.get(0).getId())))
@@ -161,7 +161,7 @@ public class MessageControllerTests {
         this.mvc
                 .perform(get("/message/friend"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
                 .andExpect(jsonPath("$", hasSize(0)));
 

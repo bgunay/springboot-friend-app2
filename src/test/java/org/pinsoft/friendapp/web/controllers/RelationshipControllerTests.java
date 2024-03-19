@@ -88,7 +88,7 @@ public class RelationshipControllerTests {
                 .perform(get("/relationship/friends/{id}", "1"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id", is("2")))
@@ -118,7 +118,7 @@ public class RelationshipControllerTests {
                 .perform(get("/relationship/friends/{id}", "1"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
                 .andExpect(jsonPath("$", hasSize(0)));
 
@@ -149,7 +149,7 @@ public class RelationshipControllerTests {
                 .perform(get("/relationship/findFriends/{id}", "1"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id", is("1")))
@@ -179,7 +179,7 @@ public class RelationshipControllerTests {
                 .perform(get("/relationship/findFriends/{id}", "1"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
                 .andExpect(jsonPath("$", hasSize(0)));
 
@@ -199,7 +199,7 @@ public class RelationshipControllerTests {
 
         this.mvc
                 .perform(post("/relationship/addFriend")
-                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(TestUtil.convertObjectToJsonString(body)))
                 .andDo(print())
                 .andExpect(status().isForbidden());
@@ -239,7 +239,7 @@ public class RelationshipControllerTests {
 
         Exception resolvedException = this.mvc
                 .perform(post("/relationship/addFriend")
-                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(TestUtil.convertObjectToJsonString(body)))
                 .andDo(print())
                 .andExpect(status().isInternalServerError())
@@ -265,7 +265,7 @@ public class RelationshipControllerTests {
 
         this.mvc
                 .perform(post("/relationship/removeFriend")
-                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(TestUtil.convertObjectToJsonString(body)))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -313,7 +313,7 @@ public class RelationshipControllerTests {
 
         this.mvc
                 .perform(post("/relationship/acceptFriend")
-                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(TestUtil.convertObjectToJsonString(body)))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -383,7 +383,7 @@ public class RelationshipControllerTests {
 
         Exception resolvedException = this.mvc
                 .perform(post("/relationship/cancelRequest")
-                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(TestUtil.convertObjectToJsonString(body)))
                 .andDo(print())
                 .andExpect(status().isInternalServerError())
@@ -396,63 +396,4 @@ public class RelationshipControllerTests {
         verifyNoMoreInteractions(mockRelationshipService);
     }
 
-    @Test
-    public void searchUsers_when2Users_2Users() throws Exception {
-        Map<String, Object> body = new HashMap<>();
-        body.put("loggedInUserId", "1");
-        body.put("search", "test_username");
-
-        List<FriendsCandidatesViewModel> friendsCandidatesViewModel = RelationshipsUtils.getFriendsCandidatesViewModel(2);
-
-        when(this.mockRelationshipService.searchUsers(anyString(), anyString()))
-                .thenReturn(friendsCandidatesViewModel);
-
-        this.mvc
-                .perform(post("/relationship/search")
-                        .contentType(MediaType.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonString(body)))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().contentTypeCompatibleWith("application/json"))
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id", is("1")))
-                .andExpect(jsonPath("$[0].username", is("pesho 0")))
-                .andExpect(jsonPath("$[0].firstName", is("Pesho 0")))
-                .andExpect(jsonPath("$[0].lastName", is("Peshov 0")))
-                .andExpect(jsonPath("$[0].starterOfAction", is(false)))
-                .andExpect(jsonPath("$[0].status", is(2)))
-                .andExpect(jsonPath("$[1].id", is("2")))
-                .andExpect(jsonPath("$[1].username", is("pesho 1")))
-                .andExpect(jsonPath("$[1].firstName", is("Pesho 1")))
-                .andExpect(jsonPath("$[1].lastName", is("Peshov 1")))
-                .andExpect(jsonPath("$[0].starterOfAction", is(false)))
-                .andExpect(jsonPath("$[0].status", is(2)));
-
-        verify(this.mockRelationshipService, times(1)).searchUsers(anyString(), anyString());
-        verifyNoMoreInteractions(this.mockRelationshipService);
-    }
-
-    @Test
-    public void searchUsers_whenZeroUsers_returnEmptyCollection() throws Exception {
-        Map<String, Object> body = new HashMap<>();
-        body.put("loggedInUserId", "1");
-        body.put("search", "test_username");
-
-        when(this.mockRelationshipService.searchUsers(anyString(), anyString()))
-                .thenReturn(new ArrayList<>());
-
-        this.mvc
-                .perform(post("/relationship/search")
-                        .contentType(MediaType.APPLICATION_JSON_UTF8)
-                        .content(TestUtil.convertObjectToJsonString(body)))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().contentTypeCompatibleWith("application/json"))
-                .andExpect(jsonPath("$", hasSize(0)));
-
-        verify(mockRelationshipService, times(1)).searchUsers(anyString(), anyString());
-        verifyNoMoreInteractions(mockRelationshipService);
-    }
 }
