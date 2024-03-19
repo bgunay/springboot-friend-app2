@@ -29,3 +29,14 @@ Within the interview we want you to create APIs for:
 
 We should use user object to send and friend request from one user to another.
 
+
+
+--------------------------------------
+
+
+- Swagger Address
+http://localhost:8080/swagger-ui/index.html
+
+
+- apiDocsUrl – URL where the docs can be accessed in JSON format, with a default of 
+http://localhost:8080/v3/api-docs
