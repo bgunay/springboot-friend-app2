@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface RelationshipService {
 
-    List<RelationshipServiceModel> findAllUserRelationshipsWithStatus(String userId) throws Exception;
+    List<RelationshipServiceModel> findAllFriends(String userId) throws Exception;
 
     List<FriendsCandidatesViewModel> findAllFriendCandidates(String loggedInUserId);
 
@@ -20,5 +20,6 @@ public interface RelationshipService {
 
     boolean cancelFriendshipRequest(String loggedInUserId, String friendToRejectId) throws Exception;
 
-    List<FriendsCandidatesViewModel> searchUsers(String loggedInUserId, String search);
+    List<RelationshipServiceModel> findPendingRequests(String userId);
+
 }

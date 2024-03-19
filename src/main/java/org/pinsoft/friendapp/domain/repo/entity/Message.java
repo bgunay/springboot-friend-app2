@@ -2,6 +2,7 @@ package org.pinsoft.friendapp.domain.repo.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
@@ -36,7 +37,8 @@ public class Message{
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "status", columnDefinition = "BIT")
+    @Column(name = "status", columnDefinition = "INT")
+    @ColumnDefault("0")
     private int status;
 
     @Column(name = "time", nullable = false)

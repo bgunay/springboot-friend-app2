@@ -31,7 +31,7 @@ public class RelationshipServiceImpl implements RelationshipService {
 
 
     @Override
-    public List<RelationshipServiceModel> findAllUserRelationshipsWithStatus(String userId) {
+    public List<RelationshipServiceModel> findAllFriends(String userId) {
         List<Relationship> relationshipList = this.relationshipRepository
                 .findRelationshipByUserIdAndStatus(userId, 1);
 
@@ -43,17 +43,17 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     @Override
-    public List<FriendsCandidatesViewModel> searchUsers(String loggedInUserId, String search) {
-        List<UserEntity> userList = this.userRepository.findAllUsersLike(loggedInUserId, search.toLowerCase());
+    public List<RelationshipServiceModel> findPendingRequests(String userId) {
+        List<Relationship> relationshipList = this.relationshipRepository
+                .findRelationshipByUserOneIdAndStatus(userId, 0);
 
-        List<Relationship> currentUserRelationshipList = this.relationshipRepository
-                .findAllByUserOneIdOrUserTwoId(loggedInUserId, loggedInUserId);
-
-        return userList.stream()
-                .map(currentUser -> this.modelMapper.map(currentUser, FriendsCandidatesViewModel.class))
-                .map(user -> mapUser(user, currentUserRelationshipList))
+        return relationshipList
+                .stream()
+                .map(relationship -> this.modelMapper
+                        .map(relationship, RelationshipServiceModel.class))
                 .collect(Collectors.toList());
     }
+
 
     @Override
     public List<FriendsCandidatesViewModel> findAllFriendCandidates(String loggedInUserId) {

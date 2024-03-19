@@ -41,20 +41,20 @@ public class RelationshipController {
     }
 
     @Operation(
-            summary = "find friends of user with UserId",
-            description = "find friends of user with UserId."
+            summary = "find all friends of user with UserId",
+            description = "find all friends of user with UserId."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "ok"),
             @ApiResponse(responseCode = "400", description = "Bad request"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @GetMapping(value = "/friends/{id}")
-    public List<FriendsAllViewModel> findAllFriends(@PathVariable String id) throws Exception {
-        List<RelationshipServiceModel> allFriends = this.relationshipService.findAllUserRelationshipsWithStatus(id);
+    @GetMapping(value = "/allfriends/{userId}")
+    public List<FriendsAllViewModel> findAllFriends(@PathVariable String userId) throws Exception {
+        List<RelationshipServiceModel> allFriends = this.relationshipService.findAllFriends(userId);
 
         return allFriends.stream().map(relationshipServiceModel -> {
-            if (!relationshipServiceModel.getUserOne().getId().equals(id)) {
+            if (!relationshipServiceModel.getUserOne().getId().equals(userId)) {
                 return this.modelMapper.map(relationshipServiceModel.getUserOne(), FriendsAllViewModel.class);
             }
 
@@ -73,10 +73,10 @@ public class RelationshipController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<String> addFriend(@RequestBody Map<String, Object> body) throws Exception {
-        String loggedInUserId = (String) body.get("loggedInUserId");
-        String friendCandidateId = (String) body.get("friendCandidateId");
+        String fromUser = (String) body.get("fromUser");
+        String toUser = (String) body.get("toUser");
 
-        boolean result = this.relationshipService.createRequestForAddingFriend(loggedInUserId, friendCandidateId);
+        boolean result = this.relationshipService.createRequestForAddingFriend(fromUser, toUser);
 
         if (result) {
             SuccessResponse successResponse = new SuccessResponse(LocalDateTime.now(), SUCCESSFUL_FRIEND_REQUEST_SUBMISSION_MESSAGE, "", true);
@@ -98,8 +98,8 @@ public class RelationshipController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<String> removeFriend(@RequestBody Map<String, Object> body) throws Exception {
-        String loggedInUserId = (String) body.get("loggedInUserId");
-        String friendToRemoveId = (String) body.get("friendToRemoveId");
+        String loggedInUserId = (String) body.get("fromUser");
+        String friendToRemoveId = (String) body.get("toUser");
 
         boolean result = this.relationshipService.removeFriend(loggedInUserId, friendToRemoveId);
 
@@ -158,26 +158,32 @@ public class RelationshipController {
         throw new CustomException(SERVER_ERROR_MESSAGE);
     }
 
-    @PostMapping(value = "/search", produces = "application/json")
+    @GetMapping(value = "/findAllFriendCandidates/{id}", produces = "application/json")
     @Operation(
-            summary = "search users in system with loggedInUserId and search key",
-            description = "search users in system with loggedInUserId and search key."
+            summary = "findPendingRequests for user",
+            description = "findPendingRequests for user."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "ok"),
             @ApiResponse(responseCode = "400", description = "Bad request"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public List<FriendsCandidatesViewModel> searchUsers(@RequestBody Map<String, Object> body) {
-        String loggedInUserId = (String) body.get("loggedInUserId");
-        String search = (String) body.get("search");
-
-        return this.relationshipService.searchUsers(loggedInUserId, search);
+    public List<FriendsCandidatesViewModel> findAllFriendCandidates(@PathVariable String id) {
+        return this.relationshipService.findAllFriendCandidates(id);
     }
 
-    @GetMapping(value = "/findFriends/{id}", produces = "application/json")
-    public List<FriendsCandidatesViewModel> findAllNotFriends(@PathVariable String id) {
-        return this.relationshipService.findAllFriendCandidates(id);
+    @GetMapping(value = "/findMyPendingRequests/{id}", produces = "application/json")
+    @Operation(
+            summary = "findMyPendingRequests for user",
+            description = "findMyPendingRequests for user."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "ok"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public List<RelationshipServiceModel> findMyPendingRequests(@PathVariable String id) {
+        return this.relationshipService.findPendingRequests(id);
     }
 }
 

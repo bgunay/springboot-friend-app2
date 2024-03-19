@@ -73,7 +73,7 @@ public class RelationshipServiceTests {
                 .thenReturn(relationshipList);
 
         // Act
-        List<RelationshipServiceModel> allUserRelationshipsWithStatus = relationshipService.findAllUserRelationshipsWithStatus("1");
+        List<RelationshipServiceModel> allUserRelationshipsWithStatus = relationshipService.findAllFriends("1");
 
         // Assert
         Relationship expected = relationshipList.get(0);
@@ -100,7 +100,7 @@ public class RelationshipServiceTests {
         when(mockRelationshipRepository.findRelationshipByUserIdAndStatus(anyString(), anyInt()))
                 .thenReturn(relationshipList);
 
-        List<RelationshipServiceModel> allUserRelationshipsWithStatus = relationshipService.findAllUserRelationshipsWithStatus("1");
+        List<RelationshipServiceModel> allUserRelationshipsWithStatus = relationshipService.findAllFriends("1");
 
         assertTrue(allUserRelationshipsWithStatus.isEmpty());
 

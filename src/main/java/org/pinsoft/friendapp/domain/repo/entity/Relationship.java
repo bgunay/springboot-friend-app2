@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
@@ -30,7 +31,8 @@ public class Relationship {
     @JoinColumn(name = "user_two_id", referencedColumnName = "id")
     private UserEntity userTwo;
 
-    @Column(name = "status", columnDefinition = "BIT", nullable = false)
+    @Column(name = "status", columnDefinition = "INT", nullable = false)
+    @ColumnDefault("0")
     private int status;
 
     @ManyToOne(optional = false, targetEntity = UserEntity.class)

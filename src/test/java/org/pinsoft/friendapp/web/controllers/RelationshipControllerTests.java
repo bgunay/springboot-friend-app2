@@ -81,7 +81,7 @@ public class RelationshipControllerTests {
         RelationshipServiceModel firstRelationshipServiceModel = RelationshipsUtils.getRelationshipServiceModel(userOne, userTwo, 1, userOne);
         RelationshipServiceModel secondRelationshipServiceModel = RelationshipsUtils.getRelationshipServiceModel(userThree, userOne, 1, userThree);
 
-        when(this.mockRelationshipService.findAllUserRelationshipsWithStatus(anyString()))
+        when(this.mockRelationshipService.findAllFriends(anyString()))
                 .thenReturn(List.of(firstRelationshipServiceModel, secondRelationshipServiceModel));
 
         this.mvc
@@ -104,14 +104,14 @@ public class RelationshipControllerTests {
                 .andExpect(jsonPath("$[1].profilePicUrl", is("profilePic 2")))
                 .andExpect(jsonPath("$[1].backgroundImageUrl", is("backgroundPic 2")));
 
-        verify(this.mockRelationshipService, times(1)).findAllUserRelationshipsWithStatus(anyString());
+        verify(this.mockRelationshipService, times(1)).findAllFriends(anyString());
         verifyNoMoreInteractions(this.mockRelationshipService);
     }
 
     @Test
     public void findAllFriends_whenZeroFriends_returnEmptyCollection() throws Exception {
 
-        when(this.mockRelationshipService.findAllUserRelationshipsWithStatus(anyString()))
+        when(this.mockRelationshipService.findAllFriends(anyString()))
                 .thenReturn(new ArrayList<>());
 
         this.mvc
@@ -123,8 +123,8 @@ public class RelationshipControllerTests {
                 .andExpect(jsonPath("$", hasSize(0)));
 
 
-        verify(mockRelationshipService).findAllUserRelationshipsWithStatus(anyString());
-        verify(mockRelationshipService, times(1)).findAllUserRelationshipsWithStatus(anyString());
+        verify(mockRelationshipService).findAllFriends(anyString());
+        verify(mockRelationshipService, times(1)).findAllFriends(anyString());
         verifyNoMoreInteractions(mockRelationshipService);
     }
 
