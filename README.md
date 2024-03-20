@@ -44,3 +44,8 @@ http://localhost:8080/v3/api-docs
 
 - send message to Socket via UI
 http://localhost:8080/
+
+- Actuator Endpoints
+http://localhost:8080/actuator/metrics
+http://localhost:8080/actuator/health
+http://localhost:8080/actuator/info
