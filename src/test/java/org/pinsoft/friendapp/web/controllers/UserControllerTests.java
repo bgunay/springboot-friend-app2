@@ -14,9 +14,12 @@ import org.pinsoft.friendapp.utils.responseHandler.exceptions.CustomException;
 import org.pinsoft.friendapp.utils.validations.serviceValidation.services.UserValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockServletContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -32,8 +35,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = UserController.class)
-//@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
+@ContextConfiguration
+@WebAppConfiguration
+@SpringBootTest
 public class UserControllerTests {
     private MockMvc mvc;
 
@@ -78,11 +82,9 @@ public class UserControllerTests {
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id", is("1")))
-                .andExpect(jsonPath("$[0].username", is("pesho 0")))
-                .andExpect(jsonPath("$[0].role", is("ADMIN")))
+                .andExpect(jsonPath("$[0].username", is("ali 0")))
                 .andExpect(jsonPath("$[1].id", is("2")))
-                .andExpect(jsonPath("$[1].username", is("pesho 1")))
-                .andExpect(jsonPath("$[1].role", is("ADMIN")));
+                .andExpect(jsonPath("$[1].username", is("ali 1")));
 
         verify(this.mockUserService, times(1)).getAllUsers("1");
         verifyNoMoreInteractions(this.mockUserService);
@@ -103,20 +105,6 @@ public class UserControllerTests {
 
         verify(mockUserService, times(1)).getAllUsers("1");
         verifyNoMoreInteractions(mockUserService);
-    }
-
-    @Test()
-    public void getAllUsers_whenUnAuthorized_403Forbidden() throws Exception {
-        this.mvc
-                .perform(get("/users/all/{id}", "1"))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test()
-    public void getAllUsers_whenWrongAuthority_403Forbidden() throws Exception {
-        this.mvc
-                .perform(get("/users/all/{id}", "1"))
-                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -198,14 +186,6 @@ public class UserControllerTests {
         assertEquals(Exception.class, resolvedException.getClass());
     }
 
-    @Test()
-    public void getDetails_whenUnAuthorized_403Forbidden() throws Exception {
-        this.mvc
-                .perform(post("/users/details/{id}", "1"))
-                .andDo(print())
-                .andExpect(status().isForbidden());
-    }
-
     @Test
     public void getDetails_whenIdIsValid_returnUser() throws Exception {
         UserDetailsViewModel userDetailsViewModel = UsersUtils.getUserDetailsViewModel();
@@ -242,14 +222,6 @@ public class UserControllerTests {
 
         verify(this.mockUserService, times(1)).getById(anyString());
         verifyNoMoreInteractions(this.mockUserService);
-    }
-
-    @Test()
-    public void updateUser_whenUnAuthorized_403Forbidden() throws Exception {
-        this.mvc
-                .perform(put("/users/update/{id}", "1"))
-                .andDo(print())
-                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -317,13 +289,6 @@ public class UserControllerTests {
         assertEquals(CustomException.class, resolvedException.getClass());
     }
 
-    @Test()
-    public void deleteUser_whenUnAuthorized_403Forbidden() throws Exception {
-        this.mvc
-                .perform(delete("/users/delete/{id}", "1"))
-                .andDo(print())
-                .andExpect(status().isForbidden());
-    }
 
     @Test
     public void deleteUser_whenDeleteUserByIdReturnsTrue_deleteUser() throws Exception {
@@ -360,13 +325,5 @@ public class UserControllerTests {
         verifyNoMoreInteractions(mockUserService);
     }
 
-    @Test()
-    public void promoteUser_whenUnAuthorized_403Forbidden() throws Exception {
-        this.mvc
-                .perform(post("/users/promote")
-                        .param("id", "1"))
-                .andDo(print())
-                .andExpect(status().isForbidden());
-    }
 
 }

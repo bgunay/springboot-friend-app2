@@ -3,6 +3,7 @@ package org.pinsoft.friendapp.service;
 
 import org.pinsoft.friendapp.domain.dto.relationship.FriendsCandidatesViewModel;
 import org.pinsoft.friendapp.domain.dto.relationship.RelationshipServiceModel;
+import org.pinsoft.friendapp.domain.dto.relationship.RelationshipViewModel;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public interface RelationshipService {
 
     boolean cancelFriendshipRequest(String loggedInUserId, String friendToRejectId) throws Exception;
 
-    List<RelationshipServiceModel> findPendingRequests(String userId);
+    List<RelationshipViewModel> findPendingRequests(String userId);
+    List<RelationshipViewModel> findWaitingRequests(String userId);
 
 }

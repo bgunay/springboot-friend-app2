@@ -9,6 +9,7 @@ import org.modelmapper.ModelMapper;
 import org.pinsoft.friendapp.domain.dto.relationship.FriendsAllViewModel;
 import org.pinsoft.friendapp.domain.dto.relationship.FriendsCandidatesViewModel;
 import org.pinsoft.friendapp.domain.dto.relationship.RelationshipServiceModel;
+import org.pinsoft.friendapp.domain.dto.relationship.RelationshipViewModel;
 import org.pinsoft.friendapp.service.RelationshipService;
 import org.pinsoft.friendapp.utils.responseHandler.exceptions.CustomException;
 import org.pinsoft.friendapp.utils.responseHandler.successResponse.SuccessResponse;
@@ -122,8 +123,8 @@ public class RelationshipController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<String> acceptFriend(@RequestBody Map<String, Object> body) throws Exception {
-        String loggedInUserId = (String) body.get("loggedInUserId");
-        String friendToAcceptId = (String) body.get("friendToAcceptId");
+        String loggedInUserId = (String) body.get("fromUser");
+        String friendToAcceptId = (String) body.get("toUser");
 
         boolean result = this.relationshipService.acceptFriend(loggedInUserId, friendToAcceptId);
 
@@ -145,8 +146,8 @@ public class RelationshipController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<String> cancelFriendshipRequest(@RequestBody Map<String, Object> body) throws Exception {
-        String loggedInUserId = (String) body.get("loggedInUserId");
-        String friendToRejectId = (String) body.get("friendToRejectId");
+        String loggedInUserId = (String) body.get("fromUser");
+        String friendToRejectId = (String) body.get("toUser");
 
         boolean result = this.relationshipService.cancelFriendshipRequest(loggedInUserId, friendToRejectId);
 
@@ -172,6 +173,20 @@ public class RelationshipController {
         return this.relationshipService.findAllFriendCandidates(id);
     }
 
+    @GetMapping(value = "/findMyWaitingRequests/{id}", produces = "application/json")
+    @Operation(
+            summary = "findMyWaitingRequests for user",
+            description = "findMyWaitingRequests for user."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "ok"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public List<RelationshipViewModel> findMyWaitingRequests(@PathVariable String id) {
+        return this.relationshipService.findWaitingRequests(id);
+    }
+
     @GetMapping(value = "/findMyPendingRequests/{id}", produces = "application/json")
     @Operation(
             summary = "findMyPendingRequests for user",
@@ -182,8 +197,22 @@ public class RelationshipController {
             @ApiResponse(responseCode = "400", description = "Bad request"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public List<RelationshipServiceModel> findMyPendingRequests(@PathVariable String id) {
+    public List<RelationshipViewModel> findMyPendingRequests(@PathVariable String id) {
         return this.relationshipService.findPendingRequests(id);
+    }
+
+    @GetMapping(value = "/findFriends/{id}", produces = "application/json")
+    @Operation(
+            summary = "find all not friend users.",
+            description = "find all not friend users."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "ok"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public List<FriendsCandidatesViewModel> findAllNotFriends(@PathVariable String id) {
+        return this.relationshipService.findAllFriendCandidates(id);
     }
 }
 

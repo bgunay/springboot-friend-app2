@@ -35,6 +35,12 @@ public interface RelationshipRepository extends JpaRepository<Relationship, Stri
     List<Relationship> findRelationshipByUserOneIdAndStatus(@Param(value = "id") String userId,
                                                          @Param(value = "status") int status);
 
+    @Query(value = "" +
+            "SELECT r FROM Relationship AS r " +
+            "WHERE r.userTwo.id = :id " +
+            "AND r.status = :status")
+    List<Relationship> findRelationshipByUserTwoIdAndStatus(@Param(value = "id") String userId,
+                                                            @Param(value = "status") int status);
 
     @Query(value = "" +
             "SELECT r FROM Relationship AS r " +

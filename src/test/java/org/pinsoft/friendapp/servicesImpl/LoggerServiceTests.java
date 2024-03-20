@@ -124,7 +124,7 @@ public class LoggerServiceTests {
                 .thenReturn(true);
 
         when(mockLoggerRepository.save(any()))
-                .thenReturn(null);
+                .thenReturn(new Logger());
 
 
         // Act
@@ -297,8 +297,8 @@ public class LoggerServiceTests {
         when(mockLoggerRepository.deleteAllByUsername(anyString())).thenReturn(new ArrayList<>());
 
         CustomException customException = Assertions.assertThrows(CustomException.class, () -> {
-            loggerService.deleteByName("burhan");
+            loggerService.deleteByName("ali");
         });
-        assertEquals(SERVER_ERROR_MESSAGE, customException.getMessage());
+        assertEquals(FAILURE_LOGS_NOT_FOUND_MESSAGE, customException.getMessage());
     }
 }

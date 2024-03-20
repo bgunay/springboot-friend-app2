@@ -57,9 +57,9 @@ public class RelationshipsUtils {
         return IntStream.range(0, count)
                 .mapToObj(index -> new FriendsCandidatesViewModel() {{
                     setId(String.valueOf(index + 1));
-                    setFirstName("Pesho " + index);
-                    setLastName("Peshov " + index);
-                    setUsername("pesho " + index);
+                    setFirstName("Ali " + index);
+                    setLastName("Aliv " + index);
+                    setUsername("ali " + index);
                     setStarterOfAction(false);
                     setStatus(2);
                 }})
@@ -70,9 +70,9 @@ public class RelationshipsUtils {
         return IntStream.range(0, count)
                 .mapToObj(index -> new FriendsAllViewModel() {{
                     setId(String.valueOf(index + 1));
-                    setFirstName("Pesho " + index);
-                    setLastName("Peshov " + index);
-                    setUsername("pesho " + index);
+                    setFirstName("Ali " + index);
+                    setLastName("Aliv " + index);
+                    setUsername("ali " + index);
                 }})
                 .collect(Collectors.toList());
     }

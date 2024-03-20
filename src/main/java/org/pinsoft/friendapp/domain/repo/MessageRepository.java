@@ -25,22 +25,15 @@ public interface MessageRepository extends JpaRepository<Message, String> {
 
     @Query(value = "select * " +
             "from messages AS m " +
-            "         INNER JOIN " +
-            "    (select m.from_user_id as from_user_m1, max(m.time) as time_m1, count(*) as count " +
-            "    from messages AS m " +
-            "    where m.to_user_id =:userId " +
-            "    GROUP BY m.from_user_id) as m1 " +
-            "                   ON m.from_user_id = m1.from_user_m1 and m.time = m1.time_m1 " +
-            "where m.to_user_id =:userId " +
+            "where m.to_userid =:userId and m.status=0 " +
             "ORDER BY m.time DESC;", nativeQuery = true)
     List<Message> getAllUnreadMessages(@Param("userId") String loggedInUserId);
 
-
-    @Query(value = "select m.from_user_id, count(*)as count " +
+    @Query(value = "select m.from_userid, count(*)as count " +
             "from messages AS m " +
             "where m.status = 0 " +
-            "  and m.to_user_id =:userId " +
-            "GROUP BY m.from_user_id " +
+            "  and m.to_userid =:userId " +
+            "GROUP BY m.from_userid, m.time " +
             "ORDER BY m.time DESC;", nativeQuery = true)
     List<Object[]> getCountOfUnreadMessagesByFromUser(@Param("userId") String loggedInUserId);
 }

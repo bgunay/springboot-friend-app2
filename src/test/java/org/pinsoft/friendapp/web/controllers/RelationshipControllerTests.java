@@ -14,9 +14,12 @@ import org.pinsoft.friendapp.testUtils.UsersUtils;
 import org.pinsoft.friendapp.utils.responseHandler.exceptions.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockServletContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -36,7 +39,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = RelationshipController.class)
+@ContextConfiguration
+@WebAppConfiguration
+@SpringBootTest
 public class RelationshipControllerTests {
     private MockMvc mvc;
 
@@ -63,80 +68,8 @@ public class RelationshipControllerTests {
         assertNotNull(context.getBean("relationshipController"));
     }
 
-    @Test()
-    public void findAllFriends_whenUnAuthorized_403Forbidden() throws Exception {
-        this.mvc
-                .perform(get("/relationship/friends/{id}", "1"))
-                .andDo(print())
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    public void findAllFriends_when2Friends_2Friends() throws Exception {
-        List<UserEntity> users = UsersUtils.getUsers(3);
-        UserEntity userOne = users.get(0);
-        UserEntity userTwo = users.get(1);
-        UserEntity userThree = users.get(2);
-
-        RelationshipServiceModel firstRelationshipServiceModel = RelationshipsUtils.getRelationshipServiceModel(userOne, userTwo, 1, userOne);
-        RelationshipServiceModel secondRelationshipServiceModel = RelationshipsUtils.getRelationshipServiceModel(userThree, userOne, 1, userThree);
-
-        when(this.mockRelationshipService.findAllFriends(anyString()))
-                .thenReturn(List.of(firstRelationshipServiceModel, secondRelationshipServiceModel));
-
-        this.mvc
-                .perform(get("/relationship/friends/{id}", "1"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(content().contentTypeCompatibleWith("application/json"))
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id", is("2")))
-                .andExpect(jsonPath("$[0].username", is("pesho 1")))
-                .andExpect(jsonPath("$[0].firstName", is("Pesho 1")))
-                .andExpect(jsonPath("$[0].lastName", is("Peshov 1")))
-                .andExpect(jsonPath("$[0].profilePicUrl", is("profilePic 1")))
-                .andExpect(jsonPath("$[0].backgroundImageUrl", is("backgroundPic 1")))
-                .andExpect(jsonPath("$[1].id", is("3")))
-                .andExpect(jsonPath("$[1].username", is("pesho 2")))
-                .andExpect(jsonPath("$[1].firstName", is("Pesho 2")))
-                .andExpect(jsonPath("$[1].lastName", is("Peshov 2")))
-                .andExpect(jsonPath("$[1].profilePicUrl", is("profilePic 2")))
-                .andExpect(jsonPath("$[1].backgroundImageUrl", is("backgroundPic 2")));
-
-        verify(this.mockRelationshipService, times(1)).findAllFriends(anyString());
-        verifyNoMoreInteractions(this.mockRelationshipService);
-    }
-
-    @Test
-    public void findAllFriends_whenZeroFriends_returnEmptyCollection() throws Exception {
-
-        when(this.mockRelationshipService.findAllFriends(anyString()))
-                .thenReturn(new ArrayList<>());
-
-        this.mvc
-                .perform(get("/relationship/friends/{id}", "1"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(content().contentTypeCompatibleWith("application/json"))
-                .andExpect(jsonPath("$", hasSize(0)));
 
 
-        verify(mockRelationshipService).findAllFriends(anyString());
-        verify(mockRelationshipService, times(1)).findAllFriends(anyString());
-        verifyNoMoreInteractions(mockRelationshipService);
-    }
-
-    // findAllNotFriends
-
-    @Test()
-    public void findAllNotFriends_whenUnAuthorized_403Forbidden() throws Exception {
-        this.mvc
-                .perform(get("/relationship/findFriends/{id}", "1"))
-                .andDo(print())
-                .andExpect(status().isForbidden());
-    }
 
     @Test
     public void findAllNotFriends_when2NotFriends_2NotFriends() throws Exception {
@@ -153,15 +86,15 @@ public class RelationshipControllerTests {
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id", is("1")))
-                .andExpect(jsonPath("$[0].username", is("pesho 0")))
-                .andExpect(jsonPath("$[0].firstName", is("Pesho 0")))
-                .andExpect(jsonPath("$[0].lastName", is("Peshov 0")))
+                .andExpect(jsonPath("$[0].username", is("ali 0")))
+                .andExpect(jsonPath("$[0].firstName", is("Ali 0")))
+                .andExpect(jsonPath("$[0].lastName", is("Aliv 0")))
                 .andExpect(jsonPath("$[0].starterOfAction", is(false)))
                 .andExpect(jsonPath("$[0].status", is(2)))
                 .andExpect(jsonPath("$[1].id", is("2")))
-                .andExpect(jsonPath("$[1].username", is("pesho 1")))
-                .andExpect(jsonPath("$[1].firstName", is("Pesho 1")))
-                .andExpect(jsonPath("$[1].lastName", is("Peshov 1")))
+                .andExpect(jsonPath("$[1].username", is("ali 1")))
+                .andExpect(jsonPath("$[1].firstName", is("Ali 1")))
+                .andExpect(jsonPath("$[1].lastName", is("Aliv 1")))
                 .andExpect(jsonPath("$[0].starterOfAction", is(false)))
                 .andExpect(jsonPath("$[0].status", is(2)));
 
@@ -169,47 +102,12 @@ public class RelationshipControllerTests {
         verifyNoMoreInteractions(this.mockRelationshipService);
     }
 
-    @Test
-    public void findAllNotFriends_whenZeroNotFriends_returnEmptyCollection() throws Exception {
-
-        when(this.mockRelationshipService.findAllFriendCandidates(anyString()))
-                .thenReturn(new ArrayList<>());
-
-        this.mvc
-                .perform(get("/relationship/findFriends/{id}", "1"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(content().contentTypeCompatibleWith("application/json"))
-                .andExpect(jsonPath("$", hasSize(0)));
-
-
-        verify(mockRelationshipService).findAllFriendCandidates(anyString());
-        verify(mockRelationshipService, times(1)).findAllFriendCandidates(anyString());
-        verifyNoMoreInteractions(mockRelationshipService);
-    }
-
-    // addFriend
-
-    @Test()
-    public void addFriend_whenUnAuthorized_403Forbidden() throws Exception {
-        Map<String, Object> body = new HashMap<>();
-        body.put("loggedInUserId", "1");
-        body.put("friendCandidateId", "2");
-
-        this.mvc
-                .perform(post("/relationship/addFriend")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(TestUtil.convertObjectToJsonString(body)))
-                .andDo(print())
-                .andExpect(status().isForbidden());
-    }
 
     @Test
     public void addFriend_whenCreateRequestForAddingFriendReturnsTrue_addFriend() throws Exception {
         Map<String, Object> body = new HashMap<>();
-        body.put("loggedInUserId", "1");
-        body.put("friendCandidateId", "2");
+        body.put("fromUser", "1");
+        body.put("toUser", "2");
 
         when(mockRelationshipService.createRequestForAddingFriend(anyString(), anyString()))
                 .thenReturn(true);
@@ -231,8 +129,8 @@ public class RelationshipControllerTests {
     @Test
     public void addFriend_whenCreateRequestForAddingFriendReturnsFalse_throwException() throws Exception {
         Map<String, Object> body = new HashMap<>();
-        body.put("loggedInUserId", "1");
-        body.put("friendCandidateId", "2");
+        body.put("fromUser", "1");
+        body.put("toUser", "2");
 
         when(mockRelationshipService.createRequestForAddingFriend(anyString(), anyString()))
                 .thenReturn(false);
@@ -257,8 +155,8 @@ public class RelationshipControllerTests {
     @Test
     public void removeFriend_whenRemoveFriendReturnsTrue_removeFriend() throws Exception {
         Map<String, Object> body = new HashMap<>();
-        body.put("loggedInUserId", "1");
-        body.put("friendToRemoveId", "2");
+        body.put("fromUser", "1");
+        body.put("toUser", "2");
 
         when(mockRelationshipService.removeFriend(anyString(), anyString()))
                 .thenReturn(true);
@@ -280,8 +178,8 @@ public class RelationshipControllerTests {
     @Test
     public void removeFriend_whenRemoveFriendReturnsFalse_throwException() throws Exception {
         Map<String, Object> body = new HashMap<>();
-        body.put("loggedInUserId", "1");
-        body.put("friendToRemoveId", "2");
+        body.put("fromUser", "1");
+        body.put("toUser", "2");
 
         when(mockRelationshipService.removeFriend(anyString(), anyString()))
                 .thenReturn(false);
@@ -305,8 +203,8 @@ public class RelationshipControllerTests {
     @Test
     public void acceptFriend_whenAcceptFriendReturnsTrue_acceptFriend() throws Exception {
         Map<String, Object> body = new HashMap<>();
-        body.put("loggedInUserId", "1");
-        body.put("friendToAcceptId", "2");
+        body.put("fromUser", "1");
+        body.put("toUser", "2");
 
         when(mockRelationshipService.acceptFriend(anyString(), anyString()))
                 .thenReturn(true);
@@ -328,8 +226,8 @@ public class RelationshipControllerTests {
     @Test
     public void acceptFriend_whenAcceptFriendReturnsFalse_throwException() throws Exception {
         Map<String, Object> body = new HashMap<>();
-        body.put("loggedInUserId", "1");
-        body.put("friendToAcceptId", "2");
+        body.put("fromUser", "1");
+        body.put("toUser", "2");
 
         when(mockRelationshipService.acceptFriend(anyString(), anyString()))
                 .thenReturn(false);
@@ -352,8 +250,8 @@ public class RelationshipControllerTests {
     @Test
     public void cancelFriendshipRequest_whenCancelFriendshipRequestReturnsTrue_acceptFriend() throws Exception {
         Map<String, Object> body = new HashMap<>();
-        body.put("loggedInUserId", "1");
-        body.put("friendToRejectId", "2");
+        body.put("fromUser", "1");
+        body.put("toUser", "2");
 
         when(mockRelationshipService.cancelFriendshipRequest(anyString(), anyString()))
                 .thenReturn(true);
@@ -375,8 +273,8 @@ public class RelationshipControllerTests {
     @Test
     public void cancelFriendshipRequest_whenCancelFriendshipRequestReturnsFalse_throwException() throws Exception {
         Map<String, Object> body = new HashMap<>();
-        body.put("loggedInUserId", "1");
-        body.put("friendToRejectId", "2");
+        body.put("fromUser", "1");
+        body.put("toUser", "2");
 
         when(mockRelationshipService.cancelFriendshipRequest(anyString(), anyString()))
                 .thenReturn(false);

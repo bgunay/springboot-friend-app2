@@ -44,15 +44,18 @@ public class LoggerServiceImpl implements LoggerService {
 
         Logger logger = this.modelMapper.map(loggerServiceModel, Logger.class);
 
-        this.loggerRepository.save(logger);
+        Logger saved = loggerRepository.save(logger);
 
-        return true;
-
+        if (saved.getId() != null) {
+            return true;
+        } else {
+            throw new CustomException(FAILURE_LOGS_SAVING_MESSAGE);
+        }
     }
 
     @Override
     public List<LoggerServiceModel> getAllLogs() {
-        return this.loggerRepository
+        return loggerRepository
                 .findAllByOrderByTimeDesc()
                 .stream()
                 .map(x -> this.modelMapper.map(x, LoggerServiceModel.class)).collect(Collectors.toList());
@@ -64,7 +67,7 @@ public class LoggerServiceImpl implements LoggerService {
             throw new CustomException(SERVER_ERROR_MESSAGE);
         }
 
-        List<LoggerServiceModel> logsByUsername = this.loggerRepository
+        List<LoggerServiceModel> logsByUsername = loggerRepository
                 .findAllByUsernameOrderByTimeDesc(username)
                 .stream()
                 .map(x -> this.modelMapper.map(x, LoggerServiceModel.class)).collect(Collectors.toList());
@@ -79,7 +82,7 @@ public class LoggerServiceImpl implements LoggerService {
     @Override
     public boolean deleteAll() {
         try {
-            this.loggerRepository.deleteAll();
+            loggerRepository.deleteAll();
             return true;
         } catch (Exception e) {
             throw new CustomException(FAILURE_LOGS_CLEARING_ERROR_MESSAGE);
@@ -94,7 +97,7 @@ public class LoggerServiceImpl implements LoggerService {
             throw new CustomException(SERVER_ERROR_MESSAGE);
         }
 
-        List<Logger> loggers = this.loggerRepository.deleteAllByUsername(username);
+        List<Logger> loggers = loggerRepository.deleteAllByUsername(username);
 
         if (loggers.size() == 0) {
             throw new CustomException(FAILURE_LOGS_NOT_FOUND_MESSAGE);

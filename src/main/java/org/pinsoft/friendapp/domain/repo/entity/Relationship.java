@@ -45,4 +45,14 @@ public class Relationship {
     @OneToMany(mappedBy = Message_.RELATIONSHIP, targetEntity = Message.class, cascade = CascadeType.ALL)
     private List<Message> messageList;
 
+    @Override
+    public String toString() {
+        return "Relationship{" +
+                "id='" + id + '\'' +
+                ", status=" + status +
+                ", time=" + time +
+                ", messageList=" + messageList +
+                '}';
+    }
+
 }

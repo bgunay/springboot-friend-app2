@@ -40,3 +40,7 @@ http://localhost:8080/swagger-ui/index.html
 
 - apiDocsUrl – URL where the docs can be accessed in JSON format, with a default of 
 http://localhost:8080/v3/api-docs
+
+
+- send message
+http://localhost:8080/

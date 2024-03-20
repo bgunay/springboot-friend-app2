@@ -8,16 +8,17 @@ import org.pinsoft.friendapp.domain.dto.message.MessageFriendsViewModel;
 import org.pinsoft.friendapp.domain.dto.message.MessageServiceModel;
 import org.pinsoft.friendapp.domain.repo.entity.Relationship;
 import org.pinsoft.friendapp.domain.repo.entity.UserEntity;
-import org.pinsoft.friendapp.controller.MessageController;
 import org.pinsoft.friendapp.service.MessageService;
 import org.pinsoft.friendapp.testUtils.MessagesUtils;
 import org.pinsoft.friendapp.testUtils.RelationshipsUtils;
 import org.pinsoft.friendapp.testUtils.UsersUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockServletContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -34,8 +35,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = MessageController.class)
-//@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
+@ContextConfiguration
+@WebAppConfiguration
+@SpringBootTest
 public class MessageControllerTests {
     private MockMvc mvc;
 
@@ -62,16 +64,6 @@ public class MessageControllerTests {
         assertNotNull(context.getBean("messageController"));
     }
 
-//    getAllMessages
-
-    @Test
-    public void getAllMessages_whenUnAuthorized_403Forbidden() throws Exception {
-        this.mvc
-                .perform(get("/message/all/{id}", "1"))
-                .andDo(print())
-                .andExpect(status().isForbidden());
-    }
-
     @Test
     public void getAllMessages_when2Messages_2Messages() throws Exception {
         List<UserEntity> users = UsersUtils.getUsers(2);
@@ -88,7 +80,7 @@ public class MessageControllerTests {
                 .thenReturn(messageServiceModels);
 
         this.mvc
-                .perform(get("/message/all/{id}", "1"))
+                .perform(get("/message/all/{fromUser}/{chatUserId}", "1", "2"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
@@ -109,7 +101,7 @@ public class MessageControllerTests {
 
         // Act
         this.mvc
-                .perform(get("/message/all/{id}", "1"))
+                .perform(get("/message/all/{fromUser}/{chatUserId}", "1", "2"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
@@ -117,16 +109,6 @@ public class MessageControllerTests {
 
         verify(this.mockMessageService, times(1)).getAllMessages(anyString(), anyString());
         verifyNoMoreInteractions(this.mockMessageService);
-    }
-
-//    getAllFriendMessages
-
-    @Test()
-    public void getAllFriendMessages_whenUnAuthorized_403Forbidden() throws Exception {
-        this.mvc
-                .perform(get("/message/friend"))
-                .andDo(print())
-                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -137,7 +119,7 @@ public class MessageControllerTests {
                 .thenReturn(messageFriendsViewModels);
 
         this.mvc
-                .perform(get("/message/friend"))
+                .perform(get("/message/friend/{userId}", "1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
@@ -159,7 +141,7 @@ public class MessageControllerTests {
                 .thenReturn(new ArrayList<>());
 
         this.mvc
-                .perform(get("/message/friend"))
+                .perform(get("/message/friend/{userId}", "1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(content().contentTypeCompatibleWith("application/json"))

@@ -3,5 +3,6 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/client/websocket-reactjs" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/webclient/react-stomp" vcs="Git" />
   </component>
 </project>

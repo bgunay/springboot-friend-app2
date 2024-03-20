@@ -1,7 +1,9 @@
 package org.pinsoft.friendapp.service.impl;
 
+import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.pinsoft.friendapp.domain.dto.message.MessageCreateBindingModel;
 import org.pinsoft.friendapp.domain.dto.message.MessageFriendsViewModel;
@@ -18,18 +20,21 @@ import org.pinsoft.friendapp.utils.validations.serviceValidation.services.Messag
 import org.pinsoft.friendapp.utils.validations.serviceValidation.services.RelationshipValidationService;
 import org.pinsoft.friendapp.utils.validations.serviceValidation.services.UserValidationService;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.pinsoft.friendapp.utils.constants.ResponseMessageConstants.SERVER_ERROR_MESSAGE;
+import static org.pinsoft.friendapp.utils.constants.ResponseMessageConstants.*;
+import static org.pinsoft.friendapp.web.websocket.WebSocketEventName.CHAT_LOGS;
 
 
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class MessageServiceImpl implements MessageService {
     private final MessageRepository messageRepository;
     private final RelationshipRepository relationshipRepository;
@@ -38,29 +43,35 @@ public class MessageServiceImpl implements MessageService {
     private final MessageValidationService messageValidation;
     private final RelationshipValidationService relationshipValidation;
     private final ModelMapper modelMapper;
+    private final SimpMessagingTemplate template;
 
     @Override
-    public MessageServiceModel createMessage(MessageCreateBindingModel messageCreateBindingModel, String loggedInUsername) throws Exception {
+    public MessageServiceModel createMessage(MessageCreateBindingModel messageCreateBindingModel, String fromUserName) {
         if (!messageValidation.isValid(messageCreateBindingModel)) {
-            throw new CustomException(SERVER_ERROR_MESSAGE);
+            throw new CustomException(INVALID_MESSAGE_FORMAT);
+        }
+
+        if(StringUtils.isBlank(fromUserName)){
+            fromUserName = messageCreateBindingModel.getToUserId();
         }
 
         UserEntity fromUser = userRepository
-                .findByUsername(loggedInUsername)
+                .findByUsername(fromUserName)
                 .filter(userValidation::isValid)
-                .orElseThrow(() -> new CustomException(SERVER_ERROR_MESSAGE));
+                .orElseThrow(() -> new CustomException(MESSAGE_FROM_USER_INVALID));
 
         UserEntity toUser = userRepository
-                .findById(messageCreateBindingModel.getToUserId())
+                .findByUsername(messageCreateBindingModel.getToUserId())
                 .filter(userValidation::isValid)
-                .orElseThrow(() -> new CustomException(SERVER_ERROR_MESSAGE));
+                .orElseThrow(() -> new CustomException(MESSAGE_TO_USER_INVALID));
 
 
         Relationship relationship = relationshipRepository
                 .findRelationshipWithFriendWithStatus(fromUser.getId(), toUser.getId(), 1);
 
         if (!relationshipValidation.isValid(relationship)) {
-            throw new CustomException(SERVER_ERROR_MESSAGE);
+            template.convertAndSend(CHAT_LOGS.getDestination(), RELATIONSHIP_INVALID_MESSAGE);
+            throw new CustomException(RELATIONSHIP_INVALID_MESSAGE);
         }
 
         MessageServiceModel messageServiceModel = new MessageServiceModel();
@@ -74,26 +85,37 @@ public class MessageServiceImpl implements MessageService {
 
         Message savedMessage = messageRepository.save(message);
 
-        return this.modelMapper.map(savedMessage, MessageServiceModel.class);
+        if(savedMessage.getId() != null){
+            return  this.modelMapper.map(savedMessage, MessageServiceModel.class);
+        } else {
+            throw new CustomException(MESSAGE_SAVE_FAILURE_MESSAGE);
+        }
 
     }
 
     @Override
     public List<MessageServiceModel> getAllMessages(String loggedInUsername, String chatUserId) {
         UserEntity loggedInUser = userRepository
-                .findByUsername(loggedInUsername)
+                .findById(loggedInUsername)
                 .filter(userValidation::isValid)
-                .orElseThrow(() -> new CustomException(SERVER_ERROR_MESSAGE));
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND_ERROR_MESSAGE + " with ID" + loggedInUsername));
 
         UserEntity chatUser = userRepository
                 .findById(chatUserId)
                 .filter(userValidation::isValid)
-                .orElseThrow(() -> new CustomException(SERVER_ERROR_MESSAGE));
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND_ERROR_MESSAGE + " with ID" + loggedInUsername));
 
         List<Message> allMessagesBetweenTwoUsers = this.messageRepository
                 .findAllMessagesBetweenTwoUsers(loggedInUser.getId(), chatUser.getId());
 
-        this.updateMessageStatus(loggedInUser.getId(), chatUserId);
+
+        if (allMessagesBetweenTwoUsers.size() > 0) {
+            for (Message msg : allMessagesBetweenTwoUsers) {
+                log.info("Message read" + msg.getSubject());
+                this.updateMessageStatus(loggedInUsername, chatUserId);
+            }
+        }
+
 
         return allMessagesBetweenTwoUsers
                 .stream().map(message -> modelMapper.map(message, MessageServiceModel.class))

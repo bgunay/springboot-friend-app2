@@ -28,7 +28,7 @@ public class WebSocketEventListener {
     @EventListener
     public void handleSessionConnected(SessionConnectEvent event) throws Exception {
         SimpMessageHeaderAccessor headers = SimpMessageHeaderAccessor.wrap(event.getMessage());
-        String username = headers.getUser().getName();
+        String username = headers.getNativeHeader("user").get(0);
 
         UserServiceModel userServiceModel = userService.updateUserOnlineStatus(username, true);
         String userId = userServiceModel.getId();
@@ -40,7 +40,7 @@ public class WebSocketEventListener {
     @EventListener
     public void handleSessionDisconnect(SessionDisconnectEvent event) throws Exception {
         SimpMessageHeaderAccessor headers = SimpMessageHeaderAccessor.wrap(event.getMessage());
-        String username = headers.getUser().getName();
+        String username = headers.getNativeHeader("user").get(0);
 
         UserServiceModel userServiceModel = userService.updateUserOnlineStatus(username, false);
         String userId = userServiceModel.getId();

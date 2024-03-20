@@ -26,6 +26,7 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
         String message = ex.getMessage();
         ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), message,
                 request.getDescription(false), false);
+        ex.printStackTrace();
         return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

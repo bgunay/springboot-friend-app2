@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class MessageAllViewModel {
     private String id;
     private String fromUserId;
+    private String fromUserUsername;
     private String fromUserFirstName;
     private String fromUserLastName;
     private String content;

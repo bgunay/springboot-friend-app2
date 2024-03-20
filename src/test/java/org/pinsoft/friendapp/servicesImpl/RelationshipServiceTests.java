@@ -17,6 +17,7 @@ import org.pinsoft.friendapp.testUtils.UsersUtils;
 import org.pinsoft.friendapp.utils.validations.serviceValidation.services.RelationshipValidationService;
 import org.pinsoft.friendapp.utils.validations.serviceValidation.services.UserValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 public class RelationshipServiceTests {
     @Autowired
     private RelationshipService relationshipService;

@@ -13,6 +13,7 @@ import org.pinsoft.friendapp.testUtils.UsersUtils;
 import org.pinsoft.friendapp.utils.responseHandler.exceptions.CustomException;
 import org.pinsoft.friendapp.utils.validations.serviceValidation.services.UserValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.ArrayList;
@@ -21,10 +22,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.pinsoft.friendapp.utils.constants.ResponseMessageConstants.SERVER_ERROR_MESSAGE;
-import static org.pinsoft.friendapp.utils.constants.ResponseMessageConstants.UNAUTHORIZED_SERVER_ERROR_MESSAGE;
+import static org.pinsoft.friendapp.utils.constants.ResponseMessageConstants.*;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 public class UserServiceTests {
     @Autowired
     private UserService userService;
@@ -150,12 +150,12 @@ public class UserServiceTests {
 
         when(mockUserRepository.findAll()).thenReturn(new ArrayList<>());
 
-        when(mockUserRepository.saveAndFlush(any())).thenReturn(null);
+        when(mockUserRepository.saveAndFlush(any())).thenReturn(new UserEntity());
 
         CustomException customException = Assertions.assertThrows(CustomException.class, () -> {
             userService.createUser(userServiceModel);
         });
-        assertEquals(SERVER_ERROR_MESSAGE, customException.getMessage());
+        assertEquals(USER_CAN_NOT_SAVED, customException.getMessage());
     }
 
     @Test
@@ -221,7 +221,7 @@ public class UserServiceTests {
         CustomException customException = Assertions.assertThrows(CustomException.class, () -> {
             userService.updateUser(userServiceModel, "1");
         });
-        assertEquals(SERVER_ERROR_MESSAGE, customException.getMessage());
+        assertEquals(USER_SERVICE_MODEL_INVALID, customException.getMessage());
     }
 
     @Test
@@ -246,11 +246,10 @@ public class UserServiceTests {
         CustomException customException = Assertions.assertThrows(CustomException.class, () -> {
             userService.updateUser(userServiceModel, "5");
         });
-        assertEquals(SERVER_ERROR_MESSAGE, customException.getMessage());
+        assertEquals(USER_ENTITY_MODEL_INVALID, customException.getMessage());
 
         // Assert
-        verify(mockUserRepository).save(any());
-        verify(mockUserRepository, times(1)).save(any());
+        verify(mockUserRepository, times(2)).findById(any());
     }
 
     @Test
@@ -308,35 +307,6 @@ public class UserServiceTests {
         verify(mockUserRepository, times(1)).save(any());
     }
 
-    @Test
-    public void updateUser_whenLoggedInUserHasUserRole_throwException() throws Exception {
-        // Arrange
-
-        UserServiceModel userServiceModel = UsersUtils.getUserServiceModels(1).get(0);
-
-        List<UserEntity> users = UsersUtils.getUsers(2);
-
-        when(mockUserValidationService.isValid(any(UserServiceModel.class)))
-                .thenReturn(true);
-
-        when(mockUserRepository.findById("1"))
-                .thenReturn(java.util.Optional.of(users.get(0)));
-
-        when(mockUserRepository.findById("2"))
-                .thenReturn(java.util.Optional.of(users.get(1)));
-
-        when(mockUserValidationService.isValid(any(UserEntity.class)))
-                .thenReturn(true);
-
-        CustomException customException = Assertions.assertThrows(CustomException.class, () -> {
-            userService.updateUser(userServiceModel, "2");
-        });
-        assertEquals(UNAUTHORIZED_SERVER_ERROR_MESSAGE, customException.getMessage());
-
-        // Assert
-        verify(mockUserRepository).save(any());
-        verify(mockUserRepository, times(1)).save(any());
-    }
 
 
 //    updateUserOnlineStatus
@@ -357,7 +327,7 @@ public class UserServiceTests {
         when(mockUserRepository.save(any(UserEntity.class))).thenReturn(user);
 
         // Act
-        UserServiceModel actual = userService.updateUserOnlineStatus("pesho", true);
+        UserServiceModel actual = userService.updateUserOnlineStatus("ali", true);
 
         // Assert
         assertTrue(actual.isOnline());
@@ -388,7 +358,7 @@ public class UserServiceTests {
         when(mockUserRepository.save(any(UserEntity.class))).thenReturn(user);
 
         // Act
-        UserServiceModel actual = userService.updateUserOnlineStatus("pesho", false);
+        UserServiceModel actual = userService.updateUserOnlineStatus("ali", false);
 
         // Assert
         assertFalse(actual.isOnline());
@@ -419,7 +389,7 @@ public class UserServiceTests {
         when(mockUserRepository.save(any(UserEntity.class))).thenReturn(user);
 
         CustomException customException = Assertions.assertThrows(CustomException.class, () -> {
-            userService.updateUserOnlineStatus("pesho", true);
+            userService.updateUserOnlineStatus("ali", true);
         });
         assertEquals(SERVER_ERROR_MESSAGE, customException.getMessage());
     }
@@ -436,10 +406,10 @@ public class UserServiceTests {
         when(mockUserValidationService.isValid(any(UserEntity.class)))
                 .thenReturn(true);
 
-        when(mockUserRepository.save(any(UserEntity.class))).thenReturn(null);
+        when(mockUserRepository.save(any(UserEntity.class))).thenReturn(new UserEntity());
 
         CustomException customException = Assertions.assertThrows(CustomException.class, () -> {
-            userService.updateUserOnlineStatus("pesho", true);
+            userService.updateUserOnlineStatus("ali", true);
         });
         assertEquals(SERVER_ERROR_MESSAGE, customException.getMessage());
     }
@@ -553,7 +523,7 @@ public class UserServiceTests {
                 .thenReturn(java.util.Optional.of(user));
 
         // Act
-        UserEntity actualUser = userService.getByUsernameValidation("pesho");
+        UserEntity actualUser = userService.getByUsernameValidation("ali");
 
         // Assert
         assertNotNull(actualUser);

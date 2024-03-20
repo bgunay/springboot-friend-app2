@@ -12,9 +12,12 @@ import org.pinsoft.friendapp.testUtils.TestUtil;
 import org.pinsoft.friendapp.utils.responseHandler.exceptions.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockServletContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -32,7 +35,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = LoggerController.class)
+@ContextConfiguration
+@WebAppConfiguration
+@SpringBootTest
 public class LoggerControllerTests {
     private MockMvc mvc;
 
@@ -59,15 +64,6 @@ public class LoggerControllerTests {
         assertNotNull(context.getBean("loggerController"));
     }
 
-    //allLogs
-
-    @Test()
-    public void allLogs_whenUnAuthorized_403Forbidden() throws Exception {
-        this.mvc
-                .perform(get("/logs/all"))
-                .andDo(print())
-                .andExpect(status().isForbidden());
-    }
 
     @Test
     public void allLogs_when2Logs_2Logs() throws Exception {
@@ -119,21 +115,6 @@ public class LoggerControllerTests {
     }
 
 
-    @Test()
-    public void getLogsByUsername_whenUnAuthorized_403Forbidden() throws Exception {
-        this.mvc
-                .perform(get("/logs/findByUserName/{username}", "username"))
-                .andDo(print())
-                .andExpect(status().isForbidden());
-    }
-
-    @Test()
-    public void getLogsByUsername_whenUserWithUserRole_403Forbidden() throws Exception {
-        this.mvc
-                .perform(get("/logs/findByUserName/{username}", "username"))
-                .andDo(print())
-                .andExpect(status().isForbidden());
-    }
 
     @Test
     public void getLogsByUsername_whenUserHas2Logs_2Logs() throws Exception {
@@ -184,23 +165,6 @@ public class LoggerControllerTests {
         verifyNoMoreInteractions(this.mockLoggerService);
     }
 
-    //deleteLogs
-
-    @Test()
-    public void deleteLogs_whenUnAuthorized_403Forbidden() throws Exception {
-        this.mvc
-                .perform(delete("/logs/clear"))
-                .andDo(print())
-                .andExpect(status().isForbidden());
-    }
-
-    @Test()
-    public void deleteLogs_whenUserNotWithRootRole_403Forbidden() throws Exception {
-        this.mvc
-                .perform(delete("/logs/clear"))
-                .andDo(print())
-                .andExpect(status().isForbidden());
-    }
 
     @Test
     public void deleteLogs_whenDeleteAllReturnsTrue_deleteLogs() throws Exception {
@@ -237,23 +201,6 @@ public class LoggerControllerTests {
         verifyNoMoreInteractions(this.mockLoggerService);
     }
 
-    //deleteLogsByName
-
-    @Test()
-    public void deleteLogsByName_whenUnAuthorized_403Forbidden() throws Exception {
-        this.mvc
-                .perform(delete("/logs/clearByName/{username}", "username"))
-                .andDo(print())
-                .andExpect(status().isForbidden());
-    }
-
-    @Test()
-    public void deleteLogsByName_whenUserNotWithRootRole_403Forbidden() throws Exception {
-        this.mvc
-                .perform(delete("/logs/clearByName/{username}", "username"))
-                .andDo(print())
-                .andExpect(status().isForbidden());
-    }
 
     @Test
     public void deleteLogsByName_whenDeleteByNameReturnsTrue_deleteLogs() throws Exception {

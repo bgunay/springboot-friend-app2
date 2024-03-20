@@ -1,6 +1,5 @@
 package org.pinsoft.friendapp.domain.dto.relationship;
 
-import com.fasterxml.jackson.annotation.*;
 import lombok.*;
 import org.pinsoft.friendapp.domain.repo.entity.UserEntity;
 
@@ -9,14 +8,15 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RelationshipServiceModel implements Serializable {
+public class RelationshipViewModel implements Serializable {
     private String id;
-    private UserEntity userOne;
-    private UserEntity userTwo;
+    private String userOne;
+    private String userTwo;
     private int status;
-    private UserEntity actionUser;
+    private String actionUser;
     private LocalDateTime time;
 
 }

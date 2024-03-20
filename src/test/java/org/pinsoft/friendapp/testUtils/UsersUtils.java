@@ -14,11 +14,11 @@ public class UsersUtils {
         return new UserEntity() {{
             setId("1");
             setPassword("1111");
-            setFirstName("Pesho");
-            setLastName("Peshov");
-            setUsername("pesho");
-            setEmail("pesho@abv.bg");
-            setCity("Sofia");
+            setFirstName("AliVeli");
+            setLastName("Aliv");
+            setUsername("ali");
+            setEmail("ali@abv.bg");
+            setCity("Istanbul");
             setAddress("Vasil Levski 1");
             setOnline(false);
         }};
@@ -29,11 +29,11 @@ public class UsersUtils {
                 .mapToObj(index -> new UserEntity() {{
                     setId(String.valueOf(index + 1));
                     setPassword("1111");
-                    setFirstName("Pesho " + index);
-                    setLastName("Peshov " + index);
-                    setUsername("pesho " + index);
-                    setEmail("pesho " + index + " @abv.bg");
-                    setCity("Sofia");
+                    setFirstName("Ali " + index);
+                    setLastName("Aliv " + index);
+                    setUsername("ali " + index);
+                    setEmail("ali " + index + " @abv.bg");
+                    setCity("Istanbul");
                     setAddress("Vasil Levski 1");
                     setOnline(false);
                 }})
@@ -44,11 +44,11 @@ public class UsersUtils {
         return new UserRegisterBindingModel() {{
             setPassword("1111");
             setConfirmPassword("1111");
-            setFirstName("Pesho");
-            setLastName("Peshov");
-            setUsername("pesho");
-            setEmail("pesho@abv.bg");
-            setCity("Sofia");
+            setFirstName("AliVeli");
+            setLastName("Aliv");
+            setUsername("ali");
+            setEmail("ali@abv.bg");
+            setCity("Istanbul");
             setAddress("Vasil Levski 1");
         }};
     }
@@ -60,11 +60,11 @@ public class UsersUtils {
                 .mapToObj(index -> new UserServiceModel() {{
                     setId(String.valueOf(index + 1));
                     setPassword("1111");
-                    setFirstName("Pesho " + index);
-                    setLastName("Peshov " + index);
-                    setUsername("pesho " + index);
-                    setEmail("pesho " + index + " @abv.bg");
-                    setCity("Sofia");
+                    setFirstName("Ali " + index);
+                    setLastName("Aliv " + index);
+                    setUsername("ali " + index);
+                    setEmail("ali " + index + " @abv.bg");
+                    setCity("Istanbul");
                     setAddress("Vasil Levski 1");
                     setOnline(false);
                 }})
@@ -74,11 +74,11 @@ public class UsersUtils {
     public static UserCreateViewModel getUserCreateViewModel() {
         return new UserCreateViewModel() {{
             setId("1");
-            setFirstName("Pesho");
-            setLastName("Peshov");
-            setUsername("pesho");
-            setEmail("pesho@abv.bg");
-            setCity("Sofia");
+            setFirstName("AliVeli");
+            setLastName("Aliv");
+            setUsername("ali");
+            setEmail("ali@abv.bg");
+            setCity("Istanbul");
             setAddress("Vasil Levski 1");
         }};
     }
@@ -86,11 +86,11 @@ public class UsersUtils {
     public static UserDetailsViewModel getUserDetailsViewModel() {
         return new UserDetailsViewModel() {{
             setId("1");
-            setFirstName("Pesho");
-            setLastName("Peshov");
-            setUsername("pesho");
-            setEmail("pesho@abv.bg");
-            setCity("Sofia");
+            setFirstName("AliVeli");
+            setLastName("Aliv");
+            setUsername("ali");
+            setEmail("ali@abv.bg");
+            setCity("Istanbul");
             setAddress("Vasil Levski 1");
         }};
     }
@@ -98,11 +98,11 @@ public class UsersUtils {
     public static UserEditViewModel getUserEditViewModel() {
         return new UserEditViewModel() {{
             setId("1");
-            setFirstName("Pesho");
-            setLastName("Peshov");
-            setUsername("pesho");
-            setEmail("pesho@abv.bg");
-            setCity("Sofia");
+            setFirstName("AliVeli");
+            setLastName("Aliv");
+            setUsername("ali");
+            setEmail("ali@abv.bg");
+            setCity("Istanbul");
             setAddress("Vasil Levski 1");
         }};
     }
@@ -110,11 +110,11 @@ public class UsersUtils {
     public static UserUpdateBindingModel getUserUpdateBindingModel() {
         return new UserUpdateBindingModel() {{
             setId("1");
-            setFirstName("Pesho");
-            setLastName("Peshov");
-            setUsername("pesho");
-            setEmail("pesho@abv.bg");
-            setCity("Sofia");
+            setFirstName("AliVeli");
+            setLastName("Aliv");
+            setUsername("ali");
+            setEmail("ali@abv.bg");
+            setCity("Istanbul");
             setAddress("Vasil Levski 1");
         }};
     }

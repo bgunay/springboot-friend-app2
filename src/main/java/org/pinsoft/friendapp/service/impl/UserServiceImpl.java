@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.pinsoft.friendapp.utils.constants.ResponseMessageConstants.SERVER_ERROR_MESSAGE;
+import static org.pinsoft.friendapp.utils.constants.ResponseMessageConstants.*;
 
 @Service
 @Transactional
@@ -54,6 +54,9 @@ public class UserServiceImpl implements UserService {
 
 
         UserEntity user = this.userRepository.saveAndFlush(userEntity);
+        if (user.getId() == null) {
+            throw new CustomException(USER_CAN_NOT_SAVED);
+        }
         UserCreateViewModel userModel = this.modelMapper.map(user, UserCreateViewModel.class);
         return userModel;
     }
@@ -61,14 +64,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean updateUser(UserServiceModel userServiceModel, String loggedInUserId) throws Exception {
         if (!userValidation.isValid(userServiceModel)) {
-            throw new Exception(SERVER_ERROR_MESSAGE);
+            throw new CustomException(USER_SERVICE_MODEL_INVALID);
         }
 
         UserEntity userToEdit = this.userRepository.findById(userServiceModel.getId()).orElse(null);
         UserEntity loggedInUser = this.userRepository.findById(loggedInUserId).orElse(null);
 
         if (!userValidation.isValid(userToEdit) || !userValidation.isValid(loggedInUser)) {
-            throw new Exception(SERVER_ERROR_MESSAGE);
+            throw new CustomException(USER_ENTITY_MODEL_INVALID);
         }
 
         UserEntity userEntity = this.modelMapper.map(userServiceModel, UserEntity.class);
@@ -92,7 +95,11 @@ public class UserServiceImpl implements UserService {
 
         UserEntity updatedUser = this.userRepository.save(user);
 
-        return this.modelMapper.map(updatedUser, UserServiceModel.class);
+        if (updatedUser.getId() != null) {
+            return this.modelMapper.map(updatedUser, UserServiceModel.class);
+        }
+
+        throw new CustomException(SERVER_ERROR_MESSAGE);
     }
 
 

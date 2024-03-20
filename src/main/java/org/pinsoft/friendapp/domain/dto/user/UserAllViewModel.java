@@ -10,5 +10,4 @@ import lombok.Setter;
 public class UserAllViewModel {
     private String id;
     private String username;
-    private String role;
 }

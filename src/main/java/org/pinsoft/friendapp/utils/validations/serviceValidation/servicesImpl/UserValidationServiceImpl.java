@@ -13,7 +13,7 @@ public class UserValidationServiceImpl implements UserValidationService {
 
     @Override
     public boolean isValid(UserEntity user) {
-        return user != null;
+        return user != null && user.getUsername() != null;
     }
 
     @Override

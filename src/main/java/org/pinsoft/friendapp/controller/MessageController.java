@@ -15,15 +15,15 @@ import org.pinsoft.friendapp.domain.dto.message.MessageServiceModel;
 import org.pinsoft.friendapp.service.MessageService;
 import org.pinsoft.friendapp.utils.responseHandler.exceptions.CustomException;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.pinsoft.friendapp.utils.constants.ResponseMessageConstants.SERVER_ERROR_MESSAGE;
+import static org.pinsoft.friendapp.utils.constants.ResponseMessageConstants.*;
+import static org.pinsoft.friendapp.web.websocket.WebSocketEventName.CHAT_LOGS;
 
 @RestController()
 @RequestMapping(value = "/message")
@@ -38,7 +38,7 @@ public class MessageController {
     private final ObjectMapper objectMapper;
 
 
-    @GetMapping(value = "/all/{fromUser}/{toUser}")
+    @GetMapping(value = "/all/{fromUser}/{chatUserId}")
     @Operation(
             summary = "Get chat with fromUser and toUser",
             description = "Get chat with fromUser and toUser."
@@ -48,15 +48,15 @@ public class MessageController {
             @ApiResponse(responseCode = "400", description = "Bad request"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public List<MessageAllViewModel> getAllMessages(@PathVariable(value = "fromUser") String fromUser,@PathVariable(value = "toUser") String toUser) {
-        List<MessageServiceModel> messageServiceModels = this.messageService.getAllMessages(fromUser, toUser);
+    public List<MessageAllViewModel> getOneFriendMessages(@PathVariable(value = "fromUser") String fromUser, @PathVariable(value = "chatUserId") String chatUserId) {
+        List<MessageServiceModel> messageServiceModels = this.messageService.getAllMessages(fromUser, chatUserId);
 
         return messageServiceModels.stream()
                 .map(messageServiceModel -> modelMapper.map(messageServiceModel, MessageAllViewModel.class))
                 .collect(Collectors.toList());
     }
 
-    @GetMapping(value = "/{userId}/friend")
+    @GetMapping(value = "/friend/{userId}")
     @Operation(
             summary = "Get chat with fromUser",
             description = "Get chat with fromUser."
@@ -71,25 +71,20 @@ public class MessageController {
     }
 
     @MessageMapping("/message")
-    @Operation(
-            summary = "endpoint for message to someone",
-            description = "Use this endpoint for message to someone."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "ok"),
-            @ApiResponse(responseCode = "400", description = "Bad request"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    public void createPrivateChatMessages(@RequestBody @Valid MessageCreateBindingModel messageCreateBindingModel, Principal principal, SimpMessageHeaderAccessor headerAccessor) throws Exception {
-        MessageServiceModel message = this.messageService.createMessage(messageCreateBindingModel, principal.getName());
+    public void createPrivateChatMessages(@RequestBody @Valid MessageCreateBindingModel messageCreateBindingModel) throws Exception {
+        MessageServiceModel message =
+                this.messageService.createMessage(messageCreateBindingModel, messageCreateBindingModel.getFromUser());
         MessageAllViewModel messageAllViewModel = this.modelMapper.map(message, MessageAllViewModel.class);
 
         if (messageAllViewModel != null) {
-            String response = this.objectMapper.writeValueAsString(messageAllViewModel);
-            template.convertAndSend("/user/" + message.getToUser().getUsername() + "/queue/position-update", response);
-            template.convertAndSend("/user/" + message.getFromUser().getUsername() + "/queue/position-update", response);
-            return;
+            template.convertAndSend(CHAT_LOGS.getDestination(), "Message Sent:" + messageAllViewModel.getTime()
+                    + ": " + messageAllViewModel.getFromUserUsername() + ": " + messageAllViewModel.getContent()  );
         }
-        throw new CustomException(SERVER_ERROR_MESSAGE);
+    }
+
+    @MessageMapping("/hello")
+    @SendTo("/chat/logs")
+    public String  chatLog(String  message) throws Exception {
+        return message;
     }
 }

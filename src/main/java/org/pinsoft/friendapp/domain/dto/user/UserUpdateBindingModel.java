@@ -34,7 +34,7 @@ public class UserUpdateBindingModel implements Serializable {
     }
 
     @Pattern(regexp = "^([a-zA-Z0-9]+)$")
-    @Size(min = 4, max = 16, message = ValidationMessageConstants.USER_INVALID_USERNAME_MESSAGE)
+    @Size(min = 3, max = 16, message = ValidationMessageConstants.USER_INVALID_USERNAME_MESSAGE)
     public String getUsername() {
         return this.username;
     }

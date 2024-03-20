@@ -4,16 +4,14 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 public class MessageCreateBindingModel {
+    private String fromUser;
     private String toUserId;
     private String content;
-
-    public MessageCreateBindingModel() {
-    }
 
     @NotNull
     @NotEmpty
     public String getToUserId() {
-        return this.toUserId;
+        return toUserId;
     }
 
     public void setToUserId(String toUserId) {
@@ -28,5 +26,15 @@ public class MessageCreateBindingModel {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    @NotNull
+    @NotEmpty
+    public String getFromUser() {
+        return fromUser;
+    }
+
+    public void setFromUserId(String fromUser) {
+        this.fromUser = fromUser;
     }
 }

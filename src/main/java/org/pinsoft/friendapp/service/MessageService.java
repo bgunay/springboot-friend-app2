@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface MessageService {
 
-    MessageServiceModel createMessage(MessageCreateBindingModel messageCreateBindingModel, String loggedInUsername) throws Exception;
+    MessageServiceModel createMessage(MessageCreateBindingModel messageCreateBindingModel, String fromUser) throws Exception;
 
     List<MessageServiceModel> getAllMessages(String loggedInUsername, String chatUserId);
 

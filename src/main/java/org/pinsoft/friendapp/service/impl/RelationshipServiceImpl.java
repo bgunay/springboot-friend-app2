@@ -4,7 +4,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.pinsoft.friendapp.domain.dto.relationship.FriendsCandidatesViewModel;
+import org.pinsoft.friendapp.domain.dto.relationship.RelationshipMapper;
 import org.pinsoft.friendapp.domain.dto.relationship.RelationshipServiceModel;
+import org.pinsoft.friendapp.domain.dto.relationship.RelationshipViewModel;
 import org.pinsoft.friendapp.domain.repo.RelationshipRepository;
 import org.pinsoft.friendapp.domain.repo.UserRepository;
 import org.pinsoft.friendapp.domain.repo.entity.Relationship;
@@ -28,6 +30,7 @@ public class RelationshipServiceImpl implements RelationshipService {
     private final ModelMapper modelMapper;
     private final UserValidationService userValidation;
     private final RelationshipValidationService relationshipValidation;
+    private final RelationshipMapper relationshipMapper;
 
 
     @Override
@@ -43,15 +46,28 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     @Override
-    public List<RelationshipServiceModel> findPendingRequests(String userId) {
+    public List<RelationshipViewModel> findPendingRequests(String userId) {
         List<Relationship> relationshipList = this.relationshipRepository
                 .findRelationshipByUserOneIdAndStatus(userId, 0);
 
-        return relationshipList
+        List<RelationshipViewModel> collect = relationshipList
                 .stream()
-                .map(relationship -> this.modelMapper
-                        .map(relationship, RelationshipServiceModel.class))
+                .map(relationshipMapper::convert)
                 .collect(Collectors.toList());
+        return collect;
+    }
+
+    @Override
+    public List<RelationshipViewModel> findWaitingRequests(String userId) {
+        List<Relationship> relationshipList = this.relationshipRepository
+                .findRelationshipByUserTwoIdAndStatus(userId, 0);
+
+
+        List<RelationshipViewModel> collect = relationshipList
+                .stream()
+                .map(relationshipMapper::convert)
+                .collect(Collectors.toList());
+        return collect;
     }
 
 

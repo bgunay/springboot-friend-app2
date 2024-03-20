@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.pinsoft.friendapp.utils.constants.ResponseMessageConstants.SERVER_ERROR_MESSAGE;
+import static org.pinsoft.friendapp.utils.constants.ResponseMessageConstants.*;
 
 @SpringBootTest
 public class MessageServiceTests {
@@ -159,16 +159,16 @@ public class MessageServiceTests {
                 .thenReturn(false);
 
         when(mockUserValidationService.isValid(secondUser))
-                .thenReturn(true);
+                .thenReturn(false);
 
         when(mockMessageRepository.findAllMessagesBetweenTwoUsers(anyString(), anyString()))
                 .thenReturn(messageList);
 
 
         CustomException customException = Assertions.assertThrows(CustomException.class, () -> {
-            List<MessageServiceModel> allMessages = messageService.getAllMessages("username", "userId");
+            messageService.getAllMessages("username", "userId");
         });
-        assertEquals(SERVER_ERROR_MESSAGE, customException.getMessage());
+        assertTrue(customException.getMessage().contains(USER_NOT_FOUND_ERROR_MESSAGE));
 
     }
 
@@ -201,7 +201,7 @@ public class MessageServiceTests {
         CustomException customException = Assertions.assertThrows(CustomException.class, () -> {
             List<MessageServiceModel> allMessages = messageService.getAllMessages("username", "userId");
         });
-        assertEquals(SERVER_ERROR_MESSAGE, customException.getMessage());
+        assertTrue(  customException.getMessage().contains("User can't found with"));
 
     }
 
@@ -229,7 +229,7 @@ public class MessageServiceTests {
         List<MessageFriendsViewModel> messageFriendsViewModels = MessagesUtils.getMessageFriendsViewModels(4);
         List<Object[]> countOfUnreadMessagesObjectArr = MessagesUtils.getCountOfUnreadMessagesObjectArr(2);
 
-        when(mockUserRepository.findByUsername(anyString()))
+        when(mockUserRepository.findById(anyString()))
                 .thenReturn(java.util.Optional.ofNullable(firstUser));
 
         when(mockUserValidationService.isValid(any(UserEntity.class)))
@@ -280,7 +280,7 @@ public class MessageServiceTests {
         List<MessageFriendsViewModel> messageFriendsViewModels = MessagesUtils.getMessageFriendsViewModels(4);
         List<Object[]> countOfUnreadMessagesObjectArr = MessagesUtils.getCountOfUnreadMessagesObjectArr(2);
 
-        when(mockUserRepository.findByUsername(anyString()))
+        when(mockUserRepository.findById(anyString()))
                 .thenReturn(java.util.Optional.ofNullable(firstUser));
 
         when(mockUserValidationService.isValid(any(UserEntity.class)))
@@ -312,7 +312,7 @@ public class MessageServiceTests {
 
         List<Object[]> countOfUnreadMessagesObjectArr = MessagesUtils.getCountOfUnreadMessagesObjectArr(2);
 
-        when(mockUserRepository.findByUsername(anyString()))
+        when(mockUserRepository.findById(anyString()))
                 .thenReturn(java.util.Optional.ofNullable(firstUser));
 
         when(mockUserValidationService.isValid(any(UserEntity.class)))
@@ -366,7 +366,7 @@ public class MessageServiceTests {
         when(mockUserRepository.findByUsername(any()))
                 .thenReturn(java.util.Optional.ofNullable(users.get(0)));
 
-        when(mockUserRepository.findById(any()))
+        when(mockUserRepository.findByUsername(any()))
                 .thenReturn(java.util.Optional.of(users.get(1)));
 
 
@@ -392,7 +392,7 @@ public class MessageServiceTests {
     }
 
     @Test
-    public void createMessage_whenMessageCreateBindingModelIsNotValid_throeException() throws Exception {
+    public void createMessage_whenMessageCreateBindingModelIsNotValid_throwException() throws Exception {
         // Arrange
         MessageCreateBindingModel messageCreateBindingModel = MessagesUtils.getMessageCreateBindingModel();
 
@@ -402,11 +402,11 @@ public class MessageServiceTests {
         CustomException customException = Assertions.assertThrows(CustomException.class, () -> {
             messageService.createMessage(messageCreateBindingModel, "username");
         });
-        assertEquals(SERVER_ERROR_MESSAGE, customException.getMessage());
+        assertEquals(INVALID_MESSAGE_FORMAT, customException.getMessage());
     }
 
     @Test
-    public void createMessage_whenFromUserIsNotValid_throeException() throws Exception {
+    public void createMessage_whenFromUserIsNotValid_throwException() throws Exception {
         // Arrange
         List<UserEntity> users = UsersUtils.getUsers(2);
         MessageCreateBindingModel messageCreateBindingModel = MessagesUtils.getMessageCreateBindingModel();
@@ -417,7 +417,7 @@ public class MessageServiceTests {
         when(mockUserRepository.findByUsername(any()))
                 .thenReturn(java.util.Optional.ofNullable(users.get(0)));
 
-        when(mockUserRepository.findById(any()))
+        when(mockUserRepository.findByUsername(any()))
                 .thenReturn(java.util.Optional.of(users.get(1)));
 
 
@@ -427,11 +427,11 @@ public class MessageServiceTests {
         CustomException customException = Assertions.assertThrows(CustomException.class, () -> {
             messageService.createMessage(messageCreateBindingModel, "username");
         });
-        assertEquals(SERVER_ERROR_MESSAGE, customException.getMessage());
+        assertEquals(MESSAGE_FROM_USER_INVALID, customException.getMessage());
     }
 
     @Test
-    public void createMessage_whenToUserIsNotValid_throeException() throws Exception {
+    public void createMessage_whenToUserIsNotValid_throwException() throws Exception {
         // Arrange
         List<UserEntity> users = UsersUtils.getUsers(2);
         MessageCreateBindingModel messageCreateBindingModel = MessagesUtils.getMessageCreateBindingModel();
@@ -442,7 +442,7 @@ public class MessageServiceTests {
         when(mockUserRepository.findByUsername(any()))
                 .thenReturn(java.util.Optional.ofNullable(users.get(0)));
 
-        when(mockUserRepository.findById(any()))
+        when(mockUserRepository.findByUsername(any()))
                 .thenReturn(java.util.Optional.of(users.get(1)));
 
 
@@ -455,13 +455,13 @@ public class MessageServiceTests {
         CustomException customException = Assertions.assertThrows(CustomException.class, () -> {
             messageService.createMessage(messageCreateBindingModel, "username");
         });
-        assertEquals(SERVER_ERROR_MESSAGE, customException.getMessage());
+        assertEquals(MESSAGE_TO_USER_INVALID, customException.getMessage());
 
 
     }
 
     @Test
-    public void createMessage_whenRelationshipIsNotValid_throeException() throws Exception {
+    public void createMessage_whenRelationshipIsNotValid_throwException() throws Exception {
         // Arrange
         List<UserEntity> users = UsersUtils.getUsers(2);
         Relationship relationship = RelationshipsUtils.createRelationship(users.get(0), users.get(1), 1, users.get(0));
@@ -473,7 +473,7 @@ public class MessageServiceTests {
         when(mockUserRepository.findByUsername(any()))
                 .thenReturn(java.util.Optional.ofNullable(users.get(0)));
 
-        when(mockUserRepository.findById(any()))
+        when(mockUserRepository.findByUsername(any()))
                 .thenReturn(java.util.Optional.of(users.get(1)));
 
 
@@ -492,11 +492,11 @@ public class MessageServiceTests {
         CustomException customException = Assertions.assertThrows(CustomException.class, () -> {
             messageService.createMessage(messageCreateBindingModel, "username");
         });
-        assertEquals(SERVER_ERROR_MESSAGE, customException.getMessage());
+        assertEquals(RELATIONSHIP_INVALID_MESSAGE, customException.getMessage());
     }
 
     @Test
-    public void createMessage_whenSaveMessageReturnsNull_throeException() throws Exception {
+    public void createMessage_whenSaveMessageReturnsNull_throwException() throws Exception {
         // Arrange
         List<UserEntity> users = UsersUtils.getUsers(2);
         Relationship relationship = RelationshipsUtils.createRelationship(users.get(0), users.get(1), 1, users.get(0));
@@ -509,7 +509,7 @@ public class MessageServiceTests {
         when(mockUserRepository.findByUsername(any()))
                 .thenReturn(java.util.Optional.ofNullable(users.get(0)));
 
-        when(mockUserRepository.findById(any()))
+        when(mockUserRepository.findByUsername(any()))
                 .thenReturn(java.util.Optional.of(users.get(1)));
 
 
@@ -525,12 +525,12 @@ public class MessageServiceTests {
         when(mockRelationshipValidation.isValid(any(Relationship.class)))
                 .thenReturn(true);
 
-        when(mockMessageRepository.save(any())).thenReturn(null);
+        when(mockMessageRepository.save(any())).thenReturn(new Message());
 
         CustomException customException = Assertions.assertThrows(CustomException.class, () -> {
             messageService.createMessage(messageCreateBindingModel, "username");
         });
-        assertEquals(SERVER_ERROR_MESSAGE, customException.getMessage());
+        assertEquals(MESSAGE_SAVE_FAILURE_MESSAGE, customException.getMessage());
 
     }
 }
