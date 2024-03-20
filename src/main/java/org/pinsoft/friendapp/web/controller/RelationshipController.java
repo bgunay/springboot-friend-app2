@@ -1,4 +1,4 @@
-package org.pinsoft.friendapp.controller;
+package org.pinsoft.friendapp.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;

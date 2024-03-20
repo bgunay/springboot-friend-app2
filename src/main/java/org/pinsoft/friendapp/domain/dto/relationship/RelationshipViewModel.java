@@ -1,7 +1,6 @@
 package org.pinsoft.friendapp.domain.dto.relationship;
 
 import lombok.*;
-import org.pinsoft.friendapp.domain.repo.entity.UserEntity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;

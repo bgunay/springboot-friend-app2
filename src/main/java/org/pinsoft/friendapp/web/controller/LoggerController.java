@@ -1,4 +1,4 @@
-package org.pinsoft.friendapp.controller;
+package org.pinsoft.friendapp.web.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,7 +10,6 @@ import org.modelmapper.ModelMapper;
 import org.pinsoft.friendapp.domain.dto.logger.LoggerServiceModel;
 import org.pinsoft.friendapp.domain.dto.logger.LoggerViewModel;
 import org.pinsoft.friendapp.service.LoggerService;
-import org.pinsoft.friendapp.utils.responseHandler.exceptions.BadRequestException;
 import org.pinsoft.friendapp.utils.responseHandler.exceptions.CustomException;
 import org.pinsoft.friendapp.utils.responseHandler.successResponse.SuccessResponse;
 import org.springframework.beans.factory.annotation.Autowired;

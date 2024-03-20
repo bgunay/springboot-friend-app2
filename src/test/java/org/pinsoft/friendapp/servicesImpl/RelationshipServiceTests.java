@@ -3,8 +3,6 @@ package org.pinsoft.friendapp.servicesImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.pinsoft.friendapp.domain.dto.relationship.FriendsCandidatesViewModel;
 import org.pinsoft.friendapp.domain.dto.relationship.RelationshipServiceModel;
 import org.pinsoft.friendapp.domain.repo.RelationshipRepository;

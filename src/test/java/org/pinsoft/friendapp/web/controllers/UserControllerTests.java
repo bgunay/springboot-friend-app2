@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pinsoft.friendapp.domain.dto.user.*;
 import org.pinsoft.friendapp.domain.repo.entity.UserEntity;
-import org.pinsoft.friendapp.controller.UserController;
 import org.pinsoft.friendapp.service.UserService;
 import org.pinsoft.friendapp.testUtils.TestUtil;
 import org.pinsoft.friendapp.testUtils.UsersUtils;
@@ -13,7 +12,6 @@ import org.pinsoft.friendapp.utils.responseHandler.exceptions.BadRequestExceptio
 import org.pinsoft.friendapp.utils.responseHandler.exceptions.CustomException;
 import org.pinsoft.friendapp.utils.validations.serviceValidation.services.UserValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;

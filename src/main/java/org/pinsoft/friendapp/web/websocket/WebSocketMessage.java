@@ -9,9 +9,6 @@ public class WebSocketMessage {
     private boolean isOnline;
     private LocalDateTime time;
 
-    public WebSocketMessage() {
-    }
-
     public WebSocketMessage(WebSocketEventName webSocketEventName, String userId, String username, boolean isOnline) {
         this.webSocketEventName = webSocketEventName;
         this.userId = userId;

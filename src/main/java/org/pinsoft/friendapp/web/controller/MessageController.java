@@ -1,4 +1,4 @@
-package org.pinsoft.friendapp.controller;
+package org.pinsoft.friendapp.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,16 +13,15 @@ import org.pinsoft.friendapp.domain.dto.message.MessageCreateBindingModel;
 import org.pinsoft.friendapp.domain.dto.message.MessageFriendsViewModel;
 import org.pinsoft.friendapp.domain.dto.message.MessageServiceModel;
 import org.pinsoft.friendapp.service.MessageService;
-import org.pinsoft.friendapp.utils.responseHandler.exceptions.CustomException;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.pinsoft.friendapp.utils.constants.ResponseMessageConstants.*;
 import static org.pinsoft.friendapp.web.websocket.WebSocketEventName.CHAT_LOGS;
 
 @RestController()
@@ -77,8 +76,8 @@ public class MessageController {
         MessageAllViewModel messageAllViewModel = this.modelMapper.map(message, MessageAllViewModel.class);
 
         if (messageAllViewModel != null) {
-            template.convertAndSend(CHAT_LOGS.getDestination(), "Message Sent:" + messageAllViewModel.getTime()
-                    + ": " + messageAllViewModel.getFromUserUsername() + ": " + messageAllViewModel.getContent()  );
+            template.convertAndSend(CHAT_LOGS.getDestination(),messageAllViewModel.getTime()
+                    + ": " + messageAllViewModel.getFromUserUsername()  + "-> " + messageAllViewModel.getToUserUsername()+ ": " + messageAllViewModel.getContent()  );
         }
     }
 
@@ -87,4 +86,5 @@ public class MessageController {
     public String  chatLog(String  message) throws Exception {
         return message;
     }
+
 }

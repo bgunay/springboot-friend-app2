@@ -40,7 +40,12 @@ public class WebSocketEventListener {
     @EventListener
     public void handleSessionDisconnect(SessionDisconnectEvent event) throws Exception {
         SimpMessageHeaderAccessor headers = SimpMessageHeaderAccessor.wrap(event.getMessage());
-        String username = headers.getNativeHeader("user").get(0);
+        String username = "";
+        if (headers.getNativeHeader("user") != null) {
+            username = headers.getNativeHeader("user").get(0);
+        } else {
+            username = "unknown";
+        }
 
         UserServiceModel userServiceModel = userService.updateUserOnlineStatus(username, false);
         String userId = userServiceModel.getId();

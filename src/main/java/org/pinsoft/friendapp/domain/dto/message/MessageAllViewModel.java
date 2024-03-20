@@ -13,6 +13,7 @@ public class MessageAllViewModel {
     private String id;
     private String fromUserId;
     private String fromUserUsername;
+    private String toUserUsername;
     private String fromUserFirstName;
     private String fromUserLastName;
     private String content;

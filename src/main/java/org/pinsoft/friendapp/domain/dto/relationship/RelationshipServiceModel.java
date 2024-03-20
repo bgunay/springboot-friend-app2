@@ -1,7 +1,9 @@
 package org.pinsoft.friendapp.domain.dto.relationship;
 
-import com.fasterxml.jackson.annotation.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.pinsoft.friendapp.domain.repo.entity.UserEntity;
 
 import java.io.Serializable;
