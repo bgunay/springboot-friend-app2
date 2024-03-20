@@ -455,7 +455,7 @@ public class MessageServiceTests {
         CustomException customException = Assertions.assertThrows(CustomException.class, () -> {
             messageService.createMessage(messageCreateBindingModel, "username");
         });
-        assertEquals(MESSAGE_TO_USER_INVALID, customException.getMessage());
+        assertEquals(MESSAGE_FROM_USER_INVALID, customException.getMessage());
 
 
     }

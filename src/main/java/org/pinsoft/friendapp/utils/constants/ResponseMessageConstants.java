@@ -13,7 +13,7 @@ public final class ResponseMessageConstants {
     // User Error Messages
     public static final String MESSAGE_SAVE_FAILURE_MESSAGE = "MEssage cannot be saved in the database!";
     public static final String INVALID_MESSAGE_FORMAT = "Failure validating message!";
-    public static final String MESSAGE_FROM_USER_INVALID = "Invalid from user!";
+    public static final String MESSAGE_FROM_USER_INVALID = "Invalid sender user!";
     public static final String USER_SERVICE_MODEL_INVALID = "Invalid userServiceModel!";
     public static final String USER_ENTITY_MODEL_INVALID = "Invalid user Entity!";
     public static final String MESSAGE_TO_USER_INVALID = "Invalid recipient!";
